@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Energía solar en Lima | Paneles, asesorías y equipos</title>
+<meta name="description" content="Venta de paneles solares, asesorías en energía y dispositivos. Pedidos por WhatsApp.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef5f7;--ink:#12303a;--blue:#1f5f7a;--sun:#f2b705;--line:#c9dce2;--card:#fff;
+--f:'Outfit',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0f2229;--ink:#e6f1f4;--blue:#7cc4de;--line:#274650;--card:#16313a}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.55 var(--f)}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header.top{display:flex;justify-content:space-between;align-items:center;padding:16px 0;gap:12px}
+header.top b{font-weight:800;font-size:18px}
+nav a{margin-left:16px;text-decoration:none;font-weight:600}
+.hero{padding:40px 0 56px;border-bottom:1px solid var(--line)}
+.hero h1{font-size:clamp(36px,8vw,64px);line-height:1.02;font-weight:800;margin:0 0 16px;max-width:14ch}
+.hero p{max-width:46ch;margin:0 0 24px}
+.sun{display:inline-block;width:28px;height:28px;border-radius:50%;background:var(--sun);box-shadow:0 0 0 6px color-mix(in srgb,var(--sun) 30%,transparent);vertical-align:middle;margin-right:10px}
+.btn{display:inline-block;background:var(--sun);color:#12303a;font:600 16px var(--f);border:0;border-radius:8px;padding:12px 20px;text-decoration:none;cursor:pointer}
+.btn.alt{background:transparent;border:2px solid var(--blue);color:var(--blue)}
+section{padding:48px 0}
+h2{font-size:30px;margin:0 0 20px;font-weight:800}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.item{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.item h3{margin:0;font-size:19px}
+.item p{margin:0;font-size:15px;flex:1}
+.price{font-weight:800;font-size:20px;color:var(--blue)}
+.svc{border-left:5px solid var(--sun);background:var(--card);padding:16px 18px;margin-bottom:12px;border-radius:0 10px 10px 0}
+.svc h3{margin:0 0 4px;font-size:19px}
+.svc p{margin:0;font-size:15px}
+#cart{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--blue);color:#fff;border:0;border-radius:999px;padding:14px 20px;font:600 16px var(--f);cursor:pointer;box-shadow:0 4px 14px #0004}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(440px,92vw);padding:20px}
+dialog::backdrop{background:#0008}
+.row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.row button{border:0;background:none;color:var(--blue);font:600 15px var(--f);cursor:pointer}
+input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink);margin-top:8px}
+footer{padding:32px 0 96px;border-top:1px solid var(--line);font-size:15px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <b><span class="sun"></span><span id="brand"></span></b>
+  <nav><a href="#tienda">Tienda</a><a href="#asesorias">Asesorías</a><a href="#contacto">Contacto</a></nav>
+</header>
+
+<div class="hero">
+  <h1>Energía solar para tu casa o negocio</h1>
+  <p>Paneles, equipos y asesoría para que sepas qué instalar, cuánto ahorrarás y cómo empezar.</p>
+  <a class="btn" href="#tienda">Ver productos</a>
+  <a class="btn alt" href="#asesorias">Pedir asesoría</a>
+</div>
+
+<section id="tienda">
+  <h2>Tienda</h2>
+  <div class="grid" id="products"></div>
+</section>
+
+<section id="asesorias">
+  <h2>Asesorías</h2>
+  <div id="services"></div>
+</section>
+
+<section id="contacto">
+  <h2>Contacto</h2>
+  <p>Escríbenos por WhatsApp y te respondemos con una cotización.</p>
+  <a class="btn" id="wa" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+</section>
+
+<footer>
+  <span id="foot"></span>
+</footer>
+</div>
+
+<button id="cart" aria-label="Abrir carrito">Carrito (<span id="count">0</span>)</button>
+
+<dialog id="dlg">
+  <h2 style="font-size:22px">Tu pedido</h2>
+  <div id="lines"></div>
+  <p><b>Total: <span id="total">S/ 0</span></b></p>
+  <label>Tu nombre<input id="name" autocomplete="name"></label>
+  <label>Notas (distrito, consulta, etc.)<textarea id="note" rows="2"></textarea></label>
+  <p style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0">
+    <button class="btn" id="send">Enviar pedido por WhatsApp</button>
+    <button class="btn alt" id="close">Seguir viendo</button>
+  </p>
+</dialog>
+
+<script>
+/* ============ EDITA SOLO ESTA SECCIÓN ============ */
+const CONFIG = {
+  negocio: "Solar Frances",
+  whatsapp: "51999999999",      // tu número con código de país, sin + ni espacios
+  ciudad: "Lima, Perú",
+  moneda: "S/"
+};
+const PRODUCTOS = [
+  {id:"panel-450", nombre:"Panel solar 450 W", desc:"Monocristalino, para techos residenciales y comerciales.", precio:650},
+  {id:"inversor-3k", nombre:"Inversor 3 kW", desc:"Convierte la energía de tus paneles en corriente para tu hogar.", precio:2400},
+  {id:"bateria-litio", nombre:"Batería de litio 5 kWh", desc:"Respaldo para cortes y uso nocturno.", precio:5200},
+  {id:"kit-basico", nombre:"Kit solar básico", desc:"Panel, controlador y accesorios para iluminación y carga.", precio:980}
+];
+const SERVICIOS = [
+  {nombre:"Evaluación de consumo", desc:"Revisamos tu recibo de luz y te decimos cuánta energía solar necesitas."},
+  {nombre:"Diseño de instalación", desc:"Definimos cantidad de paneles, inversor y baterías según tu techo y presupuesto."},
+  {nombre:"Asesoría para empresas", desc:"Análisis de ahorro y retorno de inversión para negocios y locales."}
+];
+/* ================================================= */
+
+const money = n => CONFIG.moneda+" "+n.toLocaleString("es-PE");
+let cart = {};
+try { cart = JSON.parse(localStorage.getItem("cart")||"{}"); } catch(e){}
+const $ = id => document.getElementById(id);
+
+document.title = CONFIG.negocio+" | Paneles solares, asesorías y equipos";
+$("brand").textContent = CONFIG.negocio;
+$("foot").textContent = CONFIG.negocio+" · "+CONFIG.ciudad;
+$("wa").href = "https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent("Hola, quiero información sobre energía solar.");
+
+$("products").innerHTML = PRODUCTOS.map(p =>
+ `<article class="item"><h3>${p.nombre}</h3><p>${p.desc}</p><div class="price">${money(p.precio)}</div>
+  <button class="btn" data-add="${p.id}">Agregar al pedido</button></article>`).join("");
+$("services").innerHTML = SERVICIOS.map(s =>
+ `<div class="svc"><h3>${s.nombre}</h3><p>${s.desc}</p></div>`).join("");
+
+function save(){ try{localStorage.setItem("cart",JSON.stringify(cart));}catch(e){} render(); }
+function render(){
+  const ids = Object.keys(cart).filter(id=>PRODUCTOS.some(p=>p.id===id));
+  $("count").textContent = ids.reduce((a,id)=>a+cart[id],0);
+  let total = 0;
+  $("lines").innerHTML = ids.length ? ids.map(id=>{
+    const p = PRODUCTOS.find(x=>x.id===id); total += p.precio*cart[id];
+    return `<div class="row"><span>${cart[id]} × ${p.nombre}</span><span>${money(p.precio*cart[id])} <button data-del="${id}">Quitar</button></span></div>`;
+  }).join("") : "<p>Aún no agregaste productos.</p>";
+  $("total").textContent = money(total);
+}
+document.addEventListener("click", e=>{
+  const a = e.target.dataset.add, d = e.target.dataset.del;
+  if(a){ cart[a]=(cart[a]||0)+1; save(); }
+  if(d){ delete cart[d]; save(); }
+});
+$("cart").onclick = ()=>$("dlg").showModal();
+$("close").onclick = ()=>$("dlg").close();
+$("send").onclick = ()=>{
+  const ids = Object.keys(cart).filter(id=>PRODUCTOS.some(p=>p.id===id));
+  if(!ids.length){ alert("Agrega al menos un producto."); return; }
+  let t = 0;
+  const lines = ids.map(id=>{const p=PRODUCTOS.find(x=>x.id===id); t+=p.precio*cart[id]; return `- ${cart[id]} x ${p.nombre} (${money(p.precio*cart[id])})`;});
+  const msg = `Hola, soy ${$("name").value||"un cliente"}. Quiero cotizar:\n${lines.join("\n")}\nTotal referencial: ${money(t)}\n${$("note").value}`;
+  window.open("https://wa.me/"+CONFIG.whatsapp+"?text="+encodeURIComponent(msg),"_blank");
+};
+render();
+</script>
+</body>
+</html>
