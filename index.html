@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tienda solar</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef5f7;--ink:#12303a;--blue:#1f5f7a;--sun:#f2b705;--line:#c9dce2;--card:#fff;--f:'Outfit',system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0f2229;--ink:#e6f1f4;--blue:#7cc4de;--line:#274650;--card:#16313a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 var(--f)}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header{padding:18px 0;font-weight:800;font-size:20px}
+.sun{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--sun);margin-right:8px;vertical-align:middle}
+h1{font-size:clamp(32px,7vw,54px);line-height:1.05;margin:8px 0 12px;max-width:16ch}
+.filtros{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}
+.chip{border:1px solid var(--blue);background:transparent;color:var(--blue);border-radius:999px;padding:6px 14px;font:600 15px var(--f);cursor:pointer}
+.chip.on{background:var(--blue);color:var(--bg)}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.item{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.item img,.ph{width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--line);display:block}
+.body{padding:14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.body h3{margin:0;font-size:19px}
+.price{font-weight:800;font-size:20px;color:var(--blue)}
+.stock{font-size:14px}
+.btn{background:var(--sun);color:#12303a;border:0;border-radius:8px;padding:11px 16px;font:600 16px var(--f);cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+.btn.alt{background:transparent;border:2px solid var(--blue);color:var(--blue)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.acts{display:flex;gap:8px;margin-top:auto}.acts .btn{flex:1;padding:10px 8px}
+#cartbtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--blue);color:var(--bg);border:0;border-radius:999px;padding:14px 20px;font:600 16px var(--f);cursor:pointer;box-shadow:0 4px 14px #0004}
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(520px,94vw);max-height:90vh;padding:20px}
+dialog::backdrop{background:#0008}
+dialog h2{margin:0 0 10px;font-size:24px}
+.video{position:relative;aspect-ratio:16/9;margin:12px 0}.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:8px}
+ul.car{padding-left:20px;margin:8px 0}
+.row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.row button{border:0;background:none;color:var(--blue);font:600 15px var(--f);cursor:pointer}
+input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg);color:var(--ink);margin:6px 0 10px}
+#msg{font-weight:600;margin:8px 0}
+.err{color:#c0392b}
+footer{padding:32px 0 96px;font-size:15px;border-top:1px solid var(--line);margin-top:40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><span class="sun"></span><span id="brand"></span></header>
+<h1>Paneles solares y equipos de energía</h1>
+<p>Elige tus productos, envía el pedido y te confirmamos por WhatsApp.</p>
+<div class="filtros" id="filtros"></div>
+<div class="grid" id="grid"><p>Cargando productos…</p></div>
+<footer id="foot"></footer>
+</div>
+<button id="cartbtn" aria-label="Abrir carrito">Pedido (<span id="count">0</span>)</button>
+
+<dialog id="detalle"></dialog>
+
+<dialog id="dlg">
+  <h2>Tu pedido</h2>
+  <div id="lines"></div>
+  <p><b>Total: <span id="total"></span></b></p>
+  <label>Nombre<input id="name" autocomplete="name" maxlength="80"></label>
+  <label>Teléfono<input id="tel" type="tel" autocomplete="tel" maxlength="20"></label>
+  <label>Notas (distrito, consulta, etc.)<textarea id="note" rows="2" maxlength="200"></textarea></label>
+  <div id="msg" role="status"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn" id="send">Enviar pedido</button>
+    <button class="btn alt" id="close">Seguir viendo</button>
+  </div>
+</dialog>
+
+<script>
+/* ============ EDITA SOLO ESTA SECCIÓN ============ */
+const CONFIG = {
+  negocio: "Solar Frances",
+  ciudad: "Lima, Perú",
+  whatsapp: "51960244381",              // tu número con código de país, sin + ni espacios
+  apiUrl: "https://script.google.com/macros/s/AKfycbwgZZLZtLe8UuUpUflLE3xjJJWlXHOWIlgUDmlXzTko9ZTEQNCMUnM-rudok7g-fj4LrQ/exec", // termina en /exec
+  moneda: "S/"
+};
+/* ================================================= */
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => CONFIG.moneda + " " + Number(n).toLocaleString("es-PE");
+const DEMO = [
+  {id:"demo-1",nombre:"Panel solar 450 W (demo)",categoria:"Paneles",precio:650,stock:10,descripcion:"Producto de ejemplo. Conecta tu hoja para ver tus productos.",caracteristicas:["450 W","Monocristalino"],foto:"",youtube:""}
+];
+let productos = [], cart = {}, filtro = "Todos";
+try { cart = JSON.parse(localStorage.getItem("cart") || "{}"); } catch(e){}
+
+document.title = CONFIG.negocio;
+$("brand").textContent = CONFIG.negocio;
+$("foot").textContent = CONFIG.negocio + " · " + CONFIG.ciudad;
+
+const fotoUrl = f => !f ? "" : /^https?:\/\//i.test(f) ? f : "imagenes/" + encodeURIComponent(f);
+function ytId(s){
+  s = String(s || "").trim(); if (!s) return "";
+  if (/^[\w-]{11}$/.test(s)) return s;
+  const m = s.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([\w-]{11})/);
+  return m ? m[1] : "";
+}
+const configurado = () => CONFIG.apiUrl.startsWith("https://script.google.com/");
+
+async function cargar(){
+  if (!configurado()) { productos = DEMO; }
+  else {
+    try {
+      const r = await fetch(CONFIG.apiUrl);
+      const d = await r.json();
+      productos = d.productos || [];
+    } catch(e){ $("grid").innerHTML = '<p class="err">No se pudieron cargar los productos. Intenta de nuevo.</p>'; return; }
+  }
+  pintar(); renderCart();
+}
+
+function pintar(){
+  const cats = ["Todos", ...new Set(productos.map(p => p.categoria).filter(Boolean))];
+  $("filtros").innerHTML = cats.map(c => `<button class="chip ${c===filtro?"on":""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  const lista = productos.filter(p => filtro === "Todos" || p.categoria === filtro);
+  $("grid").innerHTML = lista.length ? lista.map(p => {
+    const img = fotoUrl(p.foto);
+    const agotado = p.stock <= 0;
+    return `<article class="item">
+      ${img ? `<img src="${esc(img)}" alt="${esc(p.nombre)}" loading="lazy">` : '<div class="ph"></div>'}
+      <div class="body"><h3>${esc(p.nombre)}</h3>
+        <div class="price">${money(p.precio)}</div>
+        <div class="stock">${agotado ? "Agotado" : p.stock + " disponibles"}</div>
+        <div class="acts">
+          <button class="btn alt" data-ver="${esc(p.id)}">Ver más</button>
+          <button class="btn" data-add="${esc(p.id)}" ${agotado?"disabled":""}>Agregar</button>
+        </div></div></article>`;
+  }).join("") : "<p>No hay productos en esta categoría.</p>";
+}
+
+function ver(id){
+  const p = productos.find(x => x.id === id); if (!p) return;
+  const v = ytId(p.youtube), img = fotoUrl(p.foto);
+  $("detalle").innerHTML = `<h2>${esc(p.nombre)}</h2>
+    ${img ? `<img src="${esc(img)}" alt="${esc(p.nombre)}" style="width:100%;border-radius:8px">` : ""}
+    <p>${esc(p.descripcion)}</p>
+    ${p.caracteristicas.length ? `<ul class="car">${p.caracteristicas.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>` : ""}
+    ${v ? `<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/${v}" title="Video de ${esc(p.nombre)}" loading="lazy" allowfullscreen></iframe></div>` : ""}
+    <p class="price">${money(p.precio)}</p>
+    <div style="display:flex;gap:8px"><button class="btn" data-add="${esc(p.id)}" ${p.stock<=0?"disabled":""}>Agregar</button><button class="btn alt" id="cerrarDet">Cerrar</button></div>`;
+  $("detalle").showModal();
+}
+
+function guardar(){ try{ localStorage.setItem("cart", JSON.stringify(cart)); }catch(e){} renderCart(); }
+function renderCart(){
+  const ids = Object.keys(cart).filter(id => productos.some(p => p.id === id));
+  $("count").textContent = ids.reduce((a,id)=>a+cart[id],0);
+  let total = 0;
+  $("lines").innerHTML = ids.length ? ids.map(id => {
+    const p = productos.find(x => x.id === id); total += p.precio * cart[id];
+    return `<div class="row"><span>${cart[id]} × ${esc(p.nombre)}</span><span>${money(p.precio*cart[id])} <button data-del="${esc(id)}">Quitar</button></span></div>`;
+  }).join("") : "<p>Aún no agregaste productos.</p>";
+  $("total").textContent = money(total);
+}
+
+document.addEventListener("click", e => {
+  const t = e.target, d = t.dataset;
+  if (d.cat) { filtro = d.cat; pintar(); }
+  if (d.ver) ver(d.ver);
+  if (d.add) {
+    const p = productos.find(x => x.id === d.add);
+    if (p && (cart[p.id] || 0) < p.stock) { cart[p.id] = (cart[p.id] || 0) + 1; guardar(); }
+  }
+  if (d.del) { delete cart[d.del]; guardar(); }
+  if (t.id === "cerrarDet") $("detalle").close();
+});
+$("cartbtn").onclick = () => { $("msg").textContent = ""; $("dlg").showModal(); };
+$("close").onclick = () => $("dlg").close();
+
+$("send").onclick = async () => {
+  const ids = Object.keys(cart).filter(id => productos.some(p => p.id === id));
+  const msg = $("msg"); msg.className = "";
+  if (!ids.length) { msg.className = "err"; msg.textContent = "Agrega al menos un producto."; return; }
+  if (!$("name").value.trim()) { msg.className = "err"; msg.textContent = "Escribe tu nombre."; return; }
+  if (!configurado()) { msg.className = "err"; msg.textContent = "Falta conectar la hoja (apiUrl)."; return; }
+  $("send").disabled = true; msg.textContent = "Enviando pedido…";
+  try {
+    const r = await fetch(CONFIG.apiUrl, { method: "POST", body: JSON.stringify({
+      cliente: $("name").value, telefono: $("tel").value, notas: $("note").value,
+      items: ids.map(id => ({ id, cantidad: cart[id] }))
+    })});
+    const d = await r.json();
+    if (!d.ok) { msg.className = "err"; msg.textContent = d.error || "No se pudo enviar."; await cargar(); }
+    else {
+      cart = {}; guardar(); await cargar();
+      const txt = `Hola, soy ${$("name").value}. Hice el pedido ${d.pedidoId}: ${d.detalle}. Total ${money(d.total)}.`;
+      msg.innerHTML = `Pedido ${esc(d.pedidoId)} registrado. <br><a class="btn" target="_blank" rel="noopener" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(txt)}">Confirmar por WhatsApp</a>`;
+    }
+  } catch(e){ msg.className = "err"; msg.textContent = "Error de conexión. Intenta de nuevo."; }
+  $("send").disabled = false;
+};
+cargar();
+</script>
+</body>
+</html>
