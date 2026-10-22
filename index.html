@@ -42,15 +42,36 @@ dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);co
 dialog::backdrop{background:#0008}
 dialog h2{margin:0 0 6px;font-size:22px}
 dialog input{margin:4px 0 10px}
+.cred{margin-top:10px!important;font-size:14px;font-weight:600;color:var(--navy)}
+.rapido{border:2px solid var(--orange);background:#FFFFFF}
+.rapido .big{color:var(--red)}
+.rapido .kpis div{border-left-color:var(--orange)}
+.btn.cta{display:block;width:100%;font-size:18px;padding:14px 16px;margin-top:6px;text-align:center}
+.experto{margin:8px 0 16px}
+.experto>summary{cursor:pointer;font-weight:600;color:var(--navy);padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:12px}
+.experto[open]>summary{margin-bottom:16px}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header><span class="sun"></span><span id="brand"></span></header><div id="simulador"></div>
 <section class="hero" aria-labelledby="heroTitle">
-<h1 id="heroTitle">¿Cuántos paneles necesitas?</h1>
-<p>Dinos qué equipos usas, dónde estás y qué tipo de sistema quieres. Simulamos tu consumo contra el sol de tu ubicación, hora por hora, durante un año.</p>
+<h1 id="heroTitle">¿Cuánto pagas de luz?</h1>
+<p>Dime cuánto pagas al mes y dónde vives. En segundos te digo cuántos paneles necesitas, cuánto ahorrarías y en cuánto tiempo recuperas tu inversión.</p>
+<p class="cred">Frances Reyes · Ingeniera en energía (UTEC) · 10 años en el sector eléctrico</p>
 </section>
+
+<div class="card rapido" id="rapido"><h2>Calcula tu ahorro en 10 segundos</h2>
+<div class="f">
+<label>¿Cuánto pagas de luz al mes? (S/)<input id="rRecibo" type="number" min="10" max="50000" step="1" inputmode="decimal" placeholder="Ej. 180"></label>
+<label>Tu distrito o ciudad<input id="rLugar" list="lugares" autocomplete="off" placeholder="Ej. Los Olivos"></label>
+<button class="btn" id="rCalc" type="button">Calcular</button>
+</div>
+<div id="rMsg" class="res" role="status"></div>
+<div id="rOut"></div>
+</div>
+
+<details class="experto" id="experto"><summary>¿Quieres más precisión? Abre el modo detallado (equipo por equipo)</summary>
 
 <div class="card"><h2>1. Tus equipos</h2>
   <div class="f"><label>Costo de la electricidad (S/ por kWh)<input id="tar" type="number" step="0.01" min="0" value="0.75"></label>
@@ -90,6 +111,7 @@ dialog input{margin:4px 0 10px}
   <div id="msg" class="res" role="status"></div>
 </div>
 <div id="out"></div>
+</details>
 <p class="nota" id="foot"></p>
 </div>
 
@@ -100,7 +122,7 @@ dialog input{margin:4px 0 10px}
 
 <dialog id="dlgEsp" aria-labelledby="dlgEspTitle">
   <h2 id="dlgEspTitle">Contactar por WhatsApp</h2>
-  <p class="nota">Escribe tus datos para incluirlos en el mensaje. Si prefieres, puedes continuar sin completarlos. No se guardan en esta página.</p>
+  <p class="nota">Te envío tu cotización gratis en menos de 24 horas. Escribe tus datos para incluirlos en el mensaje; si prefieres, puedes continuar sin completarlos. No se guardan en esta página.</p>
   <label>Nombre<input id="cNom" autocomplete="name" maxlength="80" placeholder="Tu nombre"></label>
   <label>Celular<input id="cTel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="Tu número de celular"></label>
   <div id="cMsg" class="res" role="status"></div>
@@ -305,7 +327,17 @@ function dimensionar({modo, S, C, pw, llp}){
 
 <script>
 /* ============ EDITA SOLO ESTA SECCIÓN ============ */
-const CONFIG = { negocio: "Frances Reyes | Energía", ciudad: "Perú", whatsapp: "51960244381" };
+const CONFIG = {
+  negocio: "Frances Reyes | Energía", ciudad: "Perú", whatsapp: "51960244381",
+  // Cálculo rápido (valores referenciales: ajústalos con tus precios reales)
+  tarifa: 0.75,            // S/ por kWh, incluye cargos aproximados del recibo
+  panelW: 450,             // potencia del panel que ofreces (W)
+  cobertura: 0.70,         // parte del consumo que cubre un sistema conectado a la red sin batería
+  costoWpMin: 3.5,         // S/ por watt instalado (mínimo referencial)
+  costoWpMax: 5.0,         // S/ por watt instalado (máximo referencial)
+  m2Panel: 2.2,            // m² de techo por panel (incluye espacio de montaje)
+  rendimientoRespaldo: 1500 // kWh por kWp al año si no hay datos solares en línea
+};
 /* ================================================= */
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -545,6 +577,72 @@ function horaria(m){
     `<p class="nota">Barras amarillas: potencia FV promedio por hora. Líneas: potencia media modelada de cada equipo según sus horas y patrón de uso. Los nombres y sus datos aparecen arriba del gráfico; cada barra muestra su valor en kW.</p>`;
 }
 
+/* ================= CÁLCULO RÁPIDO (recibo + distrito) ================= */
+let rapido = null;
+async function ubicarRapido(q){
+  const n = norm(q);
+  let p = LUGARES.find(x => norm(x[0]) === n) || LUGARES.find(x => norm(x[0]).includes(n));
+  if (p) return { nombre: p[0], lat: p[1], lon: p[2] };
+  const on = await buscarOnline(q);
+  if (on && on.length) return { nombre: on[0][0], lat: +on[0][1], lon: +on[0][2] };
+  return null;
+}
+async function rendimientoAnual(lat, lon){
+  // NASA POWER climatología: radiación media diaria anual (kWh/m²/día) × 365 × rendimiento del sistema (0,80).
+  try {
+    const ctrl = new AbortController(), tm = setTimeout(() => ctrl.abort(), 15000);
+    const r = await fetch(`https://power.larc.nasa.gov/api/temporal/climatology/point?parameters=ALLSKY_SFC_SW_DWN&community=RE&longitude=${lon}&latitude=${lat}&format=JSON`, { signal: ctrl.signal });
+    clearTimeout(tm);
+    if (!r.ok) throw 0;
+    const ann = Number((await r.json())?.properties?.parameter?.ALLSKY_SFC_SW_DWN?.ANN);
+    if (Number.isFinite(ann) && ann > 1) return { ey: ann * 365 * 0.80, hsp: ann, fuente: "NASA POWER" };
+  } catch(e){}
+  return { ey: CONFIG.rendimientoRespaldo, hsp: null, fuente: "estimado" };
+}
+$("rCalc").onclick = async () => {
+  const m = $("rMsg"), recibo = +$("rRecibo").value, lugarTxt = $("rLugar").value.trim();
+  m.className = "res";
+  if (!(recibo >= 10 && recibo <= 50000)) { m.className = "res err"; m.textContent = "Escribe cuánto pagas de luz al mes (por ejemplo, 180)."; $("rRecibo").focus(); return; }
+  if (!lugarTxt) { m.className = "res err"; m.textContent = "Escribe tu distrito o ciudad."; $("rLugar").focus(); return; }
+  $("rCalc").disabled = true; m.textContent = "Calculando con el sol de tu zona…"; $("rOut").innerHTML = "";
+  try {
+    let u = await ubicarRapido(lugarTxt), aviso = "";
+    if (!u) { u = { nombre: "Lima", lat: -12.0464, lon: -77.0428 }; aviso = `No encontré "${lugarTxt}", calculé con el sol de Lima.`; }
+    const sol = await rendimientoAnual(u.lat, u.lon);
+    const kwhMes = recibo / CONFIG.tarifa;
+    const kwhCubre = kwhMes * 12 * CONFIG.cobertura;          // kWh al año que cubrirá el sol
+    const N = Math.max(1, Math.ceil(kwhCubre / sol.ey / (CONFIG.panelW / 1000)));
+    const kWp = N * CONFIG.panelW / 1000;
+    const ahorroMes = Math.min(kWp * sol.ey, kwhCubre) / 12 * CONFIG.tarifa;
+    const invMin = kWp * 1000 * CONFIG.costoWpMin, invMax = kWp * 1000 * CONFIG.costoWpMax;
+    const retMin = invMin / (ahorroMes * 12), retMax = invMax / (ahorroMes * 12);
+    const area = N * CONFIG.m2Panel;
+    const redondeo = v => Math.round(v / 100) * 100;
+    rapido = { recibo, lugar: u.nombre, N, kWp, ahorroMes, invMin: redondeo(invMin), invMax: redondeo(invMax), retMin, retMax, area };
+    const bajo = recibo < 80
+      ? `<div class="warn">Con un recibo bajo, el ahorro es pequeño y la inversión tarda en recuperarse. Para ti puede convenir más un kit de respaldo para cortes de luz o lámparas solares; escríbeme y te oriento.</div>` : "";
+    m.textContent = aviso;
+    $("rOut").innerHTML = `
+      <div class="big" style="margin-top:12px">${N} panel${N > 1 ? "es" : ""}</div>
+      <div class="res">de ${CONFIG.panelW} W (${fmt(kWp,2)} kWp) para ${esc(u.nombre)}</div>
+      <div class="kpis">
+        <div><b>S/ ${fmt(ahorroMes,0)}</b>ahorro aprox. al mes</div>
+        <div><b>S/ ${fmt(rapido.invMin,0)} – ${fmt(rapido.invMax,0)}</b>inversión referencial instalada</div>
+        <div><b>${fmt(retMin,0)} a ${fmt(retMax,0)} años</b>para recuperar tu inversión</div>
+        <div><b>~${fmt(area,0)} m²</b>de techo libre y sin sombra</div>
+      </div>
+      ${bajo}
+      <button class="btn cta" id="rWA" type="button">Quiero mi cotización gratis por WhatsApp</button>
+      <p class="nota">Te respondo en menos de 24 horas con una propuesta para tu casa.</p>
+      <p class="nota">Estimación referencial para un sistema conectado a la red, sin batería, que cubre cerca del ${Math.round(CONFIG.cobertura*100)} % de tu consumo (el que ocurre de día). Supone ${sol$(CONFIG.tarifa)} por kWh; sol de tu zona: ${sol.fuente === "NASA POWER" ? `NASA POWER, ${fmt(sol.hsp,1)} kWh/m² al día` : "valor promedio estimado"}. El precio final depende de tu techo, tablero y equipos. ¿Tienes cortes de luz o vives sin red? Usa el modo detallado o escríbeme.</p>`;
+    $("rWA").onclick = abrirEspecialista;
+  } catch(e) {
+    m.className = "res err"; m.textContent = "No se pudo calcular. Revisa tu conexión e intenta de nuevo.";
+  }
+  $("rCalc").disabled = false;
+};
+["rRecibo","rLugar"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("rCalc").click(); } }));
+
 /* ================= CONTACTO POR WHATSAPP ================= */
 function abrirEspecialista(){
   $("cMsg").textContent = "";
@@ -575,6 +673,10 @@ $("cEnviar").addEventListener("click", () => {
     texto += `\nResultado: ${R.N} paneles de ${ultimo.pw} W (${fmt(R.kWp,2)} kWp), inversor de ${fmt(R.inv,1)} kW`;
     if (R.cap > 0) texto += `, batería de ${fmt(R.capNom,1)} kWh`;
     texto += ".";
+  } else if (rapido) {
+    texto += `\nPago de luz: ${sol$(rapido.recibo)} al mes`;
+    texto += `\nUbicación: ${rapido.lugar}`;
+    texto += `\nCálculo rápido: ${rapido.N} paneles de ${CONFIG.panelW} W (${fmt(rapido.kWp,2)} kWp), ahorro aprox. S/ ${fmt(rapido.ahorroMes,0)} al mes.`;
   } else {
     texto += "\nTodavía no he calculado mi sistema en el simulador.";
   }
