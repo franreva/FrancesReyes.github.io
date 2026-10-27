@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Seguridad: solo se permite el código de esta página y las APIs solares indicadas. Sin rastreadores, sin anuncios, sin cookies. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://geocoding-api.open-meteo.com https://nominatim.openstreetmap.org https://re.jrc.ec.europa.eu https://power.larc.nasa.gov; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
+<meta name="robots" content="index, follow, noarchive">
 <title>Simulador solar residencial</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap">
 <style>
@@ -115,16 +120,21 @@ dialog input{margin:4px 0 10px}
 <p class="nota" id="foot"></p>
 </div>
 
-<button class="btn fab" id="wa" type="button" aria-label="Contactar por WhatsApp al +51 960 244 381">
+<button class="btn fab" id="wa" type="button" aria-label="Escríbeme por WhatsApp">
   <svg viewBox="0 0 32 32" role="img" aria-label="WhatsApp" xmlns="http://www.w3.org/2000/svg"><path d="M16.02 3.2A12.62 12.62 0 0 0 5.16 22.25L3.4 28.7l6.6-1.73A12.63 12.63 0 1 0 16.02 3.2Zm0 22.95a10.28 10.28 0 0 1-5.24-1.43l-.38-.23-3.92 1.03 1.05-3.82-.25-.4a10.3 10.3 0 1 1 8.74 4.85Zm5.65-7.72c-.31-.16-1.84-.91-2.13-1.02-.29-.1-.5-.16-.71.16-.21.31-.81 1.02-.99 1.23-.18.21-.36.23-.67.08-.31-.16-1.31-.48-2.49-1.53-.92-.82-1.54-1.83-1.72-2.14-.18-.31-.02-.48.14-.64.14-.14.31-.36.47-.54.16-.18.21-.31.31-.52.1-.21.05-.39-.03-.54-.08-.16-.71-1.7-.97-2.33-.25-.6-.51-.52-.71-.53h-.6c-.21 0-.54.08-.83.39-.29.31-1.09 1.07-1.09 2.61s1.12 3.03 1.28 3.24c.16.21 2.2 3.36 5.33 4.71.74.32 1.32.51 1.77.65.74.24 1.42.2 1.96.12.6-.09 1.84-.75 2.1-1.49.26-.73.26-1.36.18-1.49-.08-.13-.29-.21-.6-.37Z"/></svg>
-  <span>+51 960 244 381</span>
+  <span>Escríbeme por WhatsApp</span>
 </button>
 
 <dialog id="dlgEsp" aria-labelledby="dlgEspTitle">
   <h2 id="dlgEspTitle">Contactar por WhatsApp</h2>
-  <p class="nota">Te envío tu cotización gratis en menos de 24 horas. Escribe tus datos para incluirlos en el mensaje; si prefieres, puedes continuar sin completarlos. No se guardan en esta página.</p>
-  <label>Nombre<input id="cNom" autocomplete="name" maxlength="80" placeholder="Tu nombre"></label>
-  <label>Celular<input id="cTel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="Tu número de celular"></label>
+  <p class="nota">Elige qué necesitas y te respondo por WhatsApp en menos de 24 horas. No pedimos tu celular: WhatsApp ya me lo muestra al escribirme. Nada de lo que escribas se guarda en esta página.</p>
+  <label>¿Qué necesitas?<select id="cTipo">
+    <option value="una cotización de paneles solares">Cotización de paneles solares</option>
+    <option value="una asesoría energética">Asesoría para ahorrar energía</option>
+    <option value="información de dispositivos y equipos">Dispositivos y equipos</option>
+    <option value="otra consulta">Otra consulta</option>
+  </select></label>
+  <label>Nombre (opcional)<input id="cNom" autocomplete="off" maxlength="60" placeholder="¿Cómo te llamo?"></label>
   <div id="cMsg" class="res" role="status"></div>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
     <button class="btn" id="cEnviar" type="button">Continuar a WhatsApp</button>
@@ -328,7 +338,7 @@ function dimensionar({modo, S, C, pw, llp}){
 <script>
 /* ============ EDITA SOLO ESTA SECCIÓN ============ */
 const CONFIG = {
-  negocio: "Frances Reyes | Energía", ciudad: "Perú", whatsapp: "51960244381",
+  negocio: "Frances Reyes | Energía", ciudad: "Perú", whatsapp: ["51","938","282","428"].join(""),  // tu número de WhatsApp (código de país + celular)
   // Cálculo rápido (valores referenciales: ajústalos con tus precios reales)
   tarifa: 0.75,            // S/ por kWh, incluye cargos aproximados del recibo
   panelW: 450,             // potencia del panel que ofreces (W)
@@ -651,20 +661,16 @@ function abrirEspecialista(){
 }
 $("wa").addEventListener("click", abrirEspecialista);
 $("cCerrar").addEventListener("click", () => $("dlgEsp").close());
+let ultimoEnvio = 0;
 $("cEnviar").addEventListener("click", () => {
-  const nombre = $("cNom").value.trim();
-  const celular = $("cTel").value.trim();
-  const m = $("cMsg");
-  // Los datos son opcionales y no se almacenan: solo se agregan al mensaje de WhatsApp.
-  if (celular && celular.replace(/\D/g, "").length < 7) {
-    m.className = "res err";
-    m.textContent = "Revisa el celular o déjalo vacío para continuar sin ese dato.";
-    $("cTel").focus();
-    return;
-  }
-  let texto = "Hola, Frances. Quiero orientación y una cotización para un sistema solar.";
-  if (nombre) texto += "\nNombre: " + nombre;
-  if (celular) texto += "\nCelular: " + celular;
+  // Anti-spam: evita clics repetidos (máx. 1 envío cada 10 s).
+  if (Date.now() - ultimoEnvio < 10000) return;
+  ultimoEnvio = Date.now();
+  // Limpia el nombre: solo letras, espacios y signos básicos (evita enlaces o código).
+  const nombre = $("cNom").value.replace(/[^\p{L}\s.'-]/gu, "").trim().slice(0, 60);
+  const tipo = $("cTipo").value;
+  let texto = "Hola, Frances. Quiero " + tipo + ".";
+  if (nombre) texto += "\nMi nombre: " + nombre;
   if (ultimo) {
     const R = ultimo.R, C = ultimo.C;
     texto += `\nUbicación: ${ultimo.lugar || (ultimo.lat + ", " + ultimo.lon)}`;
