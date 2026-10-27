@@ -357,7 +357,6 @@ const PRESETS = [["Refrigeradora",150,8,"24h",1],["Focos LED",10,5,"noche",0],["
 const NOMBRES_MODO = { red:"Conectado a la red sin batería", redbat:"Conectado a la red con batería", aislado:"Sin conexión a la red sin batería", aisladobat:"Sin conexión a la red con batería" };
 let equipos = [], S = null, claveS = "", ultimo = null;
 
-const waUrl = t => "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(t);
 document.title = CONFIG.negocio + " | Simulador solar";
 $("brand").textContent = CONFIG.negocio;
 $("foot").textContent = CONFIG.negocio + " · " + CONFIG.ciudad;
@@ -687,11 +686,33 @@ $("cEnviar").addEventListener("click", () => {
     texto += "\nTodavía no he calculado mi sistema en el simulador.";
   }
   texto += "\n¿Me puedes orientar?";
-  const url = waUrl(texto);
-  // Cierra el diálogo y abre WhatsApp directamente; no se descarga ni genera ningún PDF.
   $("dlgEsp").close();
-  window.open(url, "_blank", "noopener,noreferrer");
+  abrirWhatsApp(texto);
 });
+
+/* Abre la app de WhatsApp directamente (sin la página de "descargar WhatsApp").
+   Si la app no está instalada, pasa a WhatsApp Web / página de WhatsApp. */
+function abrirWhatsApp(texto){
+  const num = CONFIG.whatsapp, t = encodeURIComponent(texto);
+  const movil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const app = movil && /Android/i.test(navigator.userAgent)
+    ? `intent://send?phone=${num}&text=${t}#Intent;scheme=whatsapp;S.browser_fallback_url=${encodeURIComponent("https://api.whatsapp.com/send?phone=" + num + "&text=" + t)};end`
+    : `whatsapp://send?phone=${num}&text=${t}`;
+  const respaldo = movil
+    ? `https://api.whatsapp.com/send?phone=${num}&text=${t}`
+    : `https://web.whatsapp.com/send?phone=${num}&text=${t}`;
+  let seAbrio = false;
+  const marcar = () => { seAbrio = true; };
+  const alOcultar = () => { if (document.hidden) seAbrio = true; };
+  window.addEventListener("blur", marcar, { once: true });
+  document.addEventListener("visibilitychange", alOcultar);
+  window.location.href = app;
+  setTimeout(() => {
+    window.removeEventListener("blur", marcar);
+    document.removeEventListener("visibilitychange", alOcultar);
+    if (!seAbrio && !document.hidden) window.location.href = respaldo;
+  }, movil ? 1500 : 2500);
+}
 </script>
 </body>
 </html>
