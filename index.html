@@ -58,44 +58,6 @@ dialog input{margin:4px 0 10px}
 </style>
 </head>
 <body>
-<!-- ===== SALIR DEL NAVEGADOR DE TIKTOK / INSTAGRAM / FACEBOOK ===== -->
-<div id="bannerApp" role="alert" style="display:none;position:sticky;top:0;z-index:20;background:#112233;color:#FFFFFF;padding:12px 16px;font:600 15px/1.4 system-ui,sans-serif;text-align:center">
-  <span id="bannerTxt">Para abrir WhatsApp sin problemas, abre esta página en tu navegador: toca <b>⋯</b> arriba a la derecha y elige <b>“Abrir en el navegador”</b>.</span>
-  <div style="margin-top:8px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-    <button id="bannerCopiar" type="button" style="background:#F4B000;color:#101820;border:0;border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer">Copiar enlace</button>
-    <button id="bannerCerrar" type="button" style="background:transparent;color:#FFFFFF;border:1px solid #FFFFFF;border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer">Cerrar</button>
-  </div>
-</div>
-<script>
-(function(){
-  var ua = navigator.userAgent || "";
-  // Navegadores internos de TikTok, Instagram y Facebook
-  var enApp = /musical_ly|BytedanceWebview|ByteLocale|TikTok|trill|Instagram|FBAN|FBAV|FB_IAB/i.test(ua);
-  if (!enApp) return;
-  var banner = document.getElementById("bannerApp");
-  function mostrar(){ banner.style.display = "block"; }
-  document.getElementById("bannerCerrar").onclick = function(){ banner.style.display = "none"; };
-  document.getElementById("bannerCopiar").onclick = function(){
-    var url = location.href.split("#")[0].replace(/[?&]ext=1/, "");
-    var b = this;
-    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
-      .then(function(){ b.textContent = "¡Copiado! Pégalo en Chrome o Safari"; })
-      .catch(function(){ prompt("Copia este enlace y pégalo en tu navegador:", url); });
-  };
-  // Android: intenta salir directo a Chrome (solo una vez, para no entrar en bucle)
-  if (/Android/i.test(ua) && !/[?&]ext=1/.test(location.search)) {
-    var destino = location.href.split("#")[0];
-    var fallback = destino + (destino.indexOf("?") < 0 ? "?" : "&") + "ext=1";
-    var sinProto = destino.replace(/^https?:\/\//, "");
-    location.href = "intent://" + sinProto + "#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=" + encodeURIComponent(fallback) + ";end";
-    setTimeout(function(){ if (!document.hidden) mostrar(); }, 1500);
-  } else {
-    // iPhone (Apple no permite salir automáticamente) o si ya falló el intento
-    mostrar();
-  }
-})();
-</script>
-
 <div class="wrap">
 <header><span class="sun"></span><span id="brand"></span></header><div id="simulador"></div>
 <section class="hero" aria-labelledby="heroTitle">
