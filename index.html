@@ -8,18 +8,19 @@
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
 <meta name="robots" content="index, follow, noarchive">
-<title>Simulador solar residencial</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap">
+<title>Socio Solar | Simulador solar</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 120 120%27%3E%3Ccircle cx=%2760%27 cy=%2760%27 r=%2760%27 fill=%27%2314213D%27/%3E%3Cg transform=%27translate(12 6) scale(.8)%27%3E%3Cpath d=%27M22 58A38 38 0 0 1 98 58Z%27 fill=%27%23FFC94A%27/%3E%3Crect x=%278%27 y=%2764%27 width=%27104%27 height=%279%27 rx=%274.5%27 fill=%27%23E15C23%27/%3E%3Crect x=%2730%27 y=%2782%27 width=%2760%27 height=%277%27 rx=%273.5%27 fill=%27%23F59E2E%27/%3E%3Crect x=%2744%27 y=%2796%27 width=%2732%27 height=%277%27 rx=%273.5%27 fill=%27%23F59E2E%27/%3E%3C/g%3E%3C/svg%3E">
+<meta name="theme-color" content="#14213D">
 <style>
-:root{--bg:#FFFFFF;--ink:#101820;--navy:#112233;--orange:#E67E22;--red:#DC3A36;--sun:#F4B000;--green:#112233;--green2:#E67E22;--mint:#F6F4EF;--line:#D4CEBF;--card:#F6F4EF;--muted:#4D555D;--sand:#D4CEBF;--gradient-left:#F4B000;--gradient-mid:#E67E22;--gradient-right:#C81E1E;--f:'Outfit',system-ui,sans-serif}
-@media (prefers-color-scheme:dark){:root{--bg:#FFFFFF;--ink:#101820;--navy:#112233;--orange:#E67E22;--red:#DC3A36;--sun:#F4B000;--green:#112233;--green2:#E67E22;--mint:#F6F4EF;--line:#D4CEBF;--card:#F6F4EF;--muted:#4D555D;--sand:#D4CEBF;--gradient-left:#F4B000;--gradient-mid:#E67E22;--gradient-right:#C81E1E}}
+:root{--bg:#FFFFFF;--ink:#1B1720;--navy:#14213D;--orange:#F59E2E;--red:#E15C23;--sun:#FFC94A;--green:#14213D;--green2:#E15C23;--mint:#FFF4E6;--line:#E6D8C3;--card:#FFF4E6;--muted:#5A5560;--sand:#E6D8C3;--cream:#FFF4E6;--rust:#A8410F;--gradient-left:#FFC94A;--gradient-mid:#F59E2E;--gradient-right:#E15C23;--f:Arial,'Liberation Sans',Helvetica,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#FFFFFF;--ink:#1B1720;--navy:#14213D;--orange:#F59E2E;--red:#E15C23;--sun:#FFC94A;--green:#14213D;--green2:#E15C23;--mint:#FFF4E6;--line:#E6D8C3;--card:#FFF4E6;--muted:#5A5560;--sand:#E6D8C3;--cream:#FFF4E6;--rust:#A8410F;--gradient-left:#FFC94A;--gradient-mid:#F59E2E;--gradient-right:#E15C23}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 var(--f)}
 :focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 .wrap{max-width:900px;margin:0 auto;padding:0 20px 110px}
-header{padding:18px 20px;margin:0 -20px 18px;background:var(--navy);color:#FFFFFF;font-weight:800;font-size:20px;border-radius:0 0 10px 10px}
-.sun{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--red);border:3px solid #FFFFFF;margin-right:8px;vertical-align:middle}
- .hero{position:relative;isolation:isolate;overflow:hidden;border-radius:12px;padding:22px 20px;margin:0 0 18px;background:linear-gradient(105deg,rgba(244,176,0,.25) 0%,rgba(230,126,34,.19) 52%,rgba(200,30,30,.17) 100%);border:1px solid var(--line)}
+header{padding:16px 20px;margin:0 -20px 18px;background:var(--navy);color:var(--cream);border-radius:0 0 12px 12px;display:flex;align-items:center;gap:12px}
+.logo{display:flex;align-items:center;gap:12px;text-decoration:none}.logo svg{width:52px;height:43px;flex:0 0 auto}.wm{font-weight:700;font-size:28px;letter-spacing:-.8px;line-height:1;white-space:nowrap}.wm .a{color:var(--sun)}.wm .b{color:var(--cream)}
+ .hero{position:relative;isolation:isolate;overflow:hidden;border-radius:12px;padding:22px 20px;margin:0 0 18px;background:linear-gradient(105deg,rgba(255,201,74,.30) 0%,rgba(245,158,46,.20) 52%,rgba(225,92,35,.16) 100%);border:1px solid var(--line)}
 h1{font-size:clamp(32px,7vw,52px);line-height:1.05;margin:0 0 12px;max-width:16ch;color:var(--ink)}
 .hero p{margin:0;max-width:68ch}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
@@ -28,11 +29,11 @@ h1{font-size:clamp(32px,7vw,52px);line-height:1.05;margin:0 0 12px;max-width:16c
 label{font-size:14px;font-weight:600;display:block}
 input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:#FFFFFF;color:var(--ink);margin-top:4px}
 .chk{display:flex;gap:8px;align-items:center;padding:10px 0}.chk input{width:auto;margin:0}
-.btn{background:var(--red);color:#FFFFFF;border:0;border-radius:8px;padding:11px 16px;font:600 16px var(--f);cursor:pointer;text-decoration:none;display:inline-block}
+.btn{background:var(--red);color:var(--ink);border:0;border-radius:8px;padding:11px 16px;font:700 16px var(--f);cursor:pointer;text-decoration:none;display:inline-block}
 .btn.alt{background:var(--sand);border:2px solid var(--sand);color:var(--ink)}
 .btn:disabled{opacity:.5}
 .chip{border:1px solid var(--green);background:transparent;color:var(--green);border-radius:999px;padding:6px 14px;font:600 14px var(--f);cursor:pointer}
-.res{font-size:15px;margin:8px 0}.err{color:var(--red);font-weight:600}.warn{color:var(--orange);font-size:14px;margin:4px 0}
+.res{font-size:15px;margin:8px 0}.err{color:var(--rust);font-weight:600}.warn{color:var(--rust);font-size:14px;margin:4px 0}
 .big{font-size:clamp(34px,8vw,52px);font-weight:800;color:var(--green);line-height:1}
 .kpis{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:14px 0}
 .kpis div{border-left:4px solid var(--green);padding-left:10px;font-size:14px}.kpis b{display:block;font-size:22px}
@@ -40,7 +41,7 @@ input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:
 table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}
 svg.ch{width:100%;height:auto}svg.ch text{fill:var(--ink);font:11px var(--f)}.bar{fill:var(--green)}
 .nota{font-size:13px;color:var(--muted)}.nav{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 18px}.nav a{font-size:13px;font-weight:600;color:var(--green);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 10px}.method-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}.method-grid div{background:var(--mint);border-radius:10px;padding:12px}.method-grid b{display:block;margin-bottom:4px}.legend{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.legend span{display:inline-flex;align-items:center;gap:5px;font-size:12px}.legend i{display:inline-block;width:22px;height:3px;background:var(--green);border-radius:2px}.legend i.solar{height:8px;background:var(--sun)}
-.fab{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));left:auto;transform:none;bottom:calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 14px #11223340;z-index:5;white-space:nowrap;max-width:calc(100vw - 32px);background:var(--red);color:#FFFFFF;border:2px solid #FFFFFF;display:inline-flex;align-items:center;justify-content:center;gap:9px}
+.fab{position:fixed;right:calc(16px + env(safe-area-inset-right,0px));left:auto;transform:none;bottom:calc(16px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 14px #14213D40;z-index:5;white-space:nowrap;max-width:calc(100vw - 32px);background:var(--red);color:var(--ink);border:2px solid #FFFFFF;display:inline-flex;align-items:center;justify-content:center;gap:9px}
 @media(max-width:480px){.fab{right:12px;bottom:12px;padding:11px 13px;font-size:14px;gap:7px}.fab svg{width:21px;height:21px}}
 .fab svg{width:23px;height:23px;flex:0 0 auto;fill:currentColor}
 dialog{border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);width:min(460px,94vw);max-height:92vh;padding:20px}
@@ -48,8 +49,8 @@ dialog::backdrop{background:#0008}
 dialog h2{margin:0 0 6px;font-size:22px}
 dialog input{margin:4px 0 10px}
 .cred{margin-top:10px!important;font-size:14px;font-weight:600;color:var(--navy)}
-.rapido{border:2px solid var(--orange);background:#FFFFFF}
-.rapido .big{color:var(--red)}
+.rapido{border:2px solid var(--red);background:#FFFFFF}
+.rapido .big{color:var(--rust)}
 .rapido .kpis div{border-left-color:var(--orange)}
 .btn.cta{display:block;width:100%;font-size:18px;padding:14px 16px;margin-top:6px;text-align:center}
 .experto{margin:8px 0 16px}
@@ -59,7 +60,7 @@ dialog input{margin:4px 0 10px}
 </head>
 <body>
 <div class="wrap">
-<header><span class="sun"></span><span id="brand"></span></header><div id="simulador"></div>
+<header><a class="logo" href="./" aria-label="Socio Solar, inicio"><svg viewBox="0 14 120 100" role="img" aria-label="Logo de Socio Solar"><path d="M22 58 A38 38 0 0 1 98 58 Z" fill="#FFC94A"/><rect x="8" y="64" width="104" height="9" rx="4.5" fill="#E15C23"/><rect x="30" y="82" width="60" height="7" rx="3.5" fill="#F59E2E"/><rect x="44" y="96" width="32" height="7" rx="3.5" fill="#F59E2E"/></svg><span class="wm" id="brand"><span class="a">socio</span> <span class="b">solar</span></span></a></header><div id="simulador"></div>
 <section class="hero" aria-labelledby="heroTitle">
 <h1 id="heroTitle">¿Cuánto pagas de luz?</h1>
 <p>Dime cuánto pagas al mes y dónde vives. En segundos te digo cuántos paneles necesitas, cuánto ahorrarías y en cuánto tiempo recuperas tu inversión.</p>
@@ -338,7 +339,7 @@ function dimensionar({modo, S, C, pw, llp}){
 <script>
 /* ============ EDITA SOLO ESTA SECCIÓN ============ */
 const CONFIG = {
-  negocio: "Frances Reyes | Energía", ciudad: "Perú", whatsapp: ["51","938","282","428"].join(""),  // tu número de WhatsApp (código de país + celular)
+  negocio: "Socio Solar", ciudad: "Perú", whatsapp: ["51","938","282","428"].join(""),  // tu número de WhatsApp (código de país + celular)
   // Cálculo rápido (valores referenciales: ajústalos con tus precios reales)
   tarifa: 0.75,            // S/ por kWh, incluye cargos aproximados del recibo
   panelW: 450,             // potencia del panel que ofreces (W)
@@ -358,7 +359,6 @@ const NOMBRES_MODO = { red:"Conectado a la red sin batería", redbat:"Conectado 
 let equipos = [], S = null, claveS = "", ultimo = null;
 
 document.title = CONFIG.negocio + " | Simulador solar";
-$("brand").textContent = CONFIG.negocio;
 $("foot").textContent = CONFIG.negocio + " · " + CONFIG.ciudad;
 $("pre").innerHTML += PRESETS.map((p,i) => `<option value="${i}">${esc(p[0])} (${p[1]} W)</option>`).join("");
 $("pre").onchange = e => { const p = PRESETS[e.target.value]; if (!p) return; $("n").value = p[0]; $("w").value = p[1]; $("h").value = p[2]; $("u").value = p[3]; $("mot").checked = !!p[4]; e.target.value = ""; };
