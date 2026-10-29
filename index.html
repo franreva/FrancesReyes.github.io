@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Seguridad: solo se permite el código de esta página y las APIs solares indicadas. Sin rastreadores, sin anuncios, sin cookies. -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://geocoding-api.open-meteo.com https://nominatim.openstreetmap.org https://re.jrc.ec.europa.eu https://power.larc.nasa.gov; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src https://docs.google.com https://*.googleusercontent.com https://geocoding-api.open-meteo.com https://nominatim.openstreetmap.org https://re.jrc.ec.europa.eu https://power.larc.nasa.gov; base-uri 'none'; form-action 'none'; object-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=(), payment=(), usb=()">
 <meta name="robots" content="index, follow, noarchive">
@@ -56,6 +56,23 @@ dialog input{margin:4px 0 10px}
 .experto{margin:8px 0 16px}
 .experto>summary{cursor:pointer;font-weight:600;color:var(--navy);padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-bottom:12px}
 .experto[open]>summary{margin-bottom:16px}
+/* Catálogo */
+.cat-filtros{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.cat-filtros .chip[aria-pressed="true"]{background:var(--navy);color:#FFFFFF;border-color:var(--navy)}
+.cat-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.prod{background:#FFFFFF;border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.prod .ph{aspect-ratio:4/3;background:var(--cream);display:flex;align-items:center;justify-content:center}
+.prod .ph{background:#FFFFFF;border-bottom:1px solid var(--line)}.prod .ph img{width:100%;height:100%;object-fit:contain;display:block}
+.prod .bd{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.prod h3{margin:0;font-size:17px;line-height:1.25}
+.prod .cat{font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--rust)}
+.prod .desc{font-size:14px;margin:0;color:var(--muted)}
+.prod ul{margin:0;padding-left:18px;font-size:13px}
+.prod .precio{font-size:22px;font-weight:800;color:var(--navy);margin-top:auto}
+.prod .precio small{font-size:13px;font-weight:600;color:var(--muted)}
+.prod .stk{font-size:13px;font-weight:600}.prod .stk.ago{color:var(--rust)}
+.prod .acc{display:flex;gap:8px;flex-wrap:wrap}.prod .acc .btn{flex:1;text-align:center;font-size:15px;padding:10px 12px}
+.ver-cat{display:inline-block;margin-top:12px;font-weight:700;color:var(--navy)}
 </style>
 </head>
 <body>
@@ -65,6 +82,7 @@ dialog input{margin:4px 0 10px}
 <h1 id="heroTitle">¿Cuánto pagas de luz?</h1>
 <p>Dime cuánto pagas al mes y dónde vives. En segundos te digo cuántos paneles necesitas, cuánto ahorrarías y en cuánto tiempo recuperas tu inversión.</p>
 <p class="cred">Frances Reyes · Ingeniero en energía (UTEC) · 10 años en el sector eléctrico</p>
+<a class="ver-cat" href="#catalogo">Ver catálogo de productos →</a>
 </section>
 
 <div class="card rapido" id="rapido"><h2>Calcula tu ahorro en 10 segundos</h2>
@@ -118,6 +136,13 @@ dialog input{margin:4px 0 10px}
 </div>
 <div id="out"></div>
 </details>
+
+<section class="card" id="catalogo" aria-labelledby="catTitle" style="background:#FFFFFF">
+<h2 id="catTitle">Catálogo Socio Solar</h2>
+<p class="nota" style="margin-top:0">Precios en soles con IGV. Venta desde Lima con envíos a todo el Perú. Pide por WhatsApp y te confirmo stock y entrega.</p>
+<div class="cat-filtros" id="catFiltros" role="group" aria-label="Filtrar por colección"></div>
+<div class="cat-grid" id="catGrid"><p class="nota">Cargando productos…</p></div>
+</section>
 <p class="nota" id="foot"></p>
 </div>
 
@@ -347,7 +372,10 @@ const CONFIG = {
   costoWpMin: 3.5,         // S/ por watt instalado (mínimo referencial)
   costoWpMax: 5.0,         // S/ por watt instalado (máximo referencial)
   m2Panel: 2.2,            // m² de techo por panel (incluye espacio de montaje)
-  rendimientoRespaldo: 1500 // kWh por kWp al año si no hay datos solares en línea
+  rendimientoRespaldo: 1500, // kWh por kWp al año si no hay datos solares en línea
+  // Catálogo: enlace CSV de "Archivo > Compartir > Publicar en la Web" (solo la pestaña Productos)
+  catalogoCSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSccyYZp7NbU4vklbRZ12CdKmZkVChkiFshjhH2_5fjm3FgVb_OBPNbMJqrzFjpezNyMUM3-Emh8jze/pub?gid=2035835181&single=true&output=csv",
+  carpetaFotos: "imagenes/" // si la columna foto tiene solo un nombre (panel-450.jpg), se busca aquí
 };
 /* ================================================= */
 const $ = id => document.getElementById(id);
@@ -689,6 +717,91 @@ $("cEnviar").addEventListener("click", () => {
   $("dlgEsp").close();
   abrirWhatsApp(texto);
 });
+
+/* ================= CATÁLOGO (lee Google Sheets) ================= */
+function leerCSV(txt){
+  const filas = []; let f = [], c = "", q = false;
+  for (let i = 0; i < txt.length; i++){
+    const ch = txt[i];
+    if (q){ if (ch === '"'){ if (txt[i+1] === '"'){ c += '"'; i++; } else q = false; } else c += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === ","){ f.push(c); c = ""; }
+    else if (ch === "\n" || ch === "\r"){ if (ch === "\r" && txt[i+1] === "\n") i++; f.push(c); filas.push(f); f = []; c = ""; }
+    else c += ch;
+  }
+  if (c !== "" || f.length){ f.push(c); filas.push(f); }
+  const cab = (filas.shift() || []).map(h => h.trim().toLowerCase());
+  return filas.filter(r => r.some(x => x.trim())).map(r => Object.fromEntries(cab.map((h,i) => [h, (r[i] || "").trim()])));
+}
+const esSi = v => /^(si|sí|s|x|1|true|verdadero)$/i.test(String(v).trim());
+const urlSegura = u => /^https:\/\//i.test(u) ? u : "";
+function fotoDe(p){
+  const f = p.foto || "";
+  if (!f) return "";
+  if (/^https:\/\//i.test(f)) return f;
+  return /^[\w.-]+$/.test(f) ? CONFIG.carpetaFotos + f : "";
+}
+function precioDe(p){
+  const n = Number(String(p.precio).replace(/[^\d.]/g, ""));
+  const tipo = (p.tipo_precio || "fijo").toLowerCase();
+  if (!n || tipo === "consultar") return { html: "Precio a consultar", txt: "" };
+  const v = "S/ " + n.toLocaleString("es-PE", { maximumFractionDigits: 2 });
+  return tipo === "desde" ? { html: "<small>Desde</small> " + v, txt: "desde " + v } : { html: v, txt: v };
+}
+let catProductos = [], catFiltro = "Todos";
+function pintarCatalogo(){
+  const lista = catFiltro === "Todos" ? catProductos : catProductos.filter(p => p.coleccion === catFiltro);
+  $("catGrid").innerHTML = lista.length ? lista.map((p, i) => {
+    const pr = precioDe(p), foto = fotoDe(p), yt = urlSegura(p.youtube);
+    const stockN = p.stock === "" ? null : Number(p.stock);
+    const agotado = stockN !== null && stockN <= 0;
+    const feats = (p.caracteristicas || "").split(";").map(x => x.trim()).filter(Boolean).slice(0, 4);
+    return `<article class="prod">
+      <div class="ph">${foto ? `<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer">` : ""}</div>
+      <div class="bd">
+        <span class="cat">${esc(p.categoria || p.coleccion)}</span>
+        <h3>${esc(p.nombre)}</h3>
+        ${p.descripcion ? `<p class="desc">${esc(p.descripcion)}</p>` : ""}
+        ${feats.length ? `<ul>${feats.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+        <div class="precio">${pr.html}</div>
+        ${stockN === null ? "" : `<div class="stk${agotado ? " ago" : ""}">${agotado ? "Agotado: consulta reposición" : stockN <= 3 ? "¡Últimas " + stockN + " unidades!" : "En stock"}</div>`}
+        <div class="acc">
+          <button class="btn" type="button" data-pedir="${catProductos.indexOf(p)}">${agotado ? "Consultar" : "Pedir por WhatsApp"}</button>
+          ${yt ? `<a class="btn alt" href="${esc(yt)}" target="_blank" rel="noopener noreferrer">Ver video</a>` : ""}
+        </div>
+      </div></article>`;
+  }).join("") : `<p class="nota">Pronto tendremos productos en esta colección. Escríbeme por WhatsApp y te ayudo.</p>`;
+}
+$("catGrid").addEventListener("click", e => {
+  const b = e.target.closest("[data-pedir]"); if (!b) return;
+  const p = catProductos[+b.dataset.pedir]; if (!p) return;
+  const pr = precioDe(p);
+  abrirWhatsApp(`Hola, Frances. Me interesa: ${p.nombre}${pr.txt ? " (" + pr.txt + ")" : ""}. Código: ${p.codigo}.\n¿Tienes stock y cuánto cuesta el envío?`);
+});
+$("catFiltros").addEventListener("click", e => {
+  const b = e.target.closest("[data-col]"); if (!b) return;
+  catFiltro = b.dataset.col;
+  $("catFiltros").querySelectorAll("[data-col]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  pintarCatalogo();
+});
+async function cargarCatalogo(){
+  const sec = $("catalogo");
+  if (!/^https:\/\/docs\.google\.com\//.test(CONFIG.catalogoCSV)){ sec.hidden = true; return; }
+  try {
+    const r = await fetch(CONFIG.catalogoCSV, { cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer" });
+    if (!r.ok) throw new Error(r.status);
+    catProductos = leerCSV(await r.text())
+      .filter(p => p.nombre && esSi(p.mostrar_web))
+      .sort((a, b) => (Number(a.orden) || 999) - (Number(b.orden) || 999));
+    if (!catProductos.length){ sec.hidden = true; return; }
+    const cols = [...new Set(catProductos.map(p => p.coleccion).filter(Boolean))];
+    $("catFiltros").innerHTML = cols.length > 1 ? ["Todos", ...cols].map((c, i) => `<button class="chip" type="button" data-col="${esc(c)}" aria-pressed="${i === 0}">${esc(c)}</button>`).join("") : "";
+    pintarCatalogo();
+  } catch (err) {
+    $("catGrid").innerHTML = `<p class="nota">No pude cargar el catálogo ahora. Escríbeme por WhatsApp y te envío la lista de productos y precios.</p>`;
+  }
+}
+cargarCatalogo();
 
 /* Abre la app de WhatsApp directamente (sin la página de "descargar WhatsApp").
    Si la app no está instalada, pasa a WhatsApp Web / página de WhatsApp. */
