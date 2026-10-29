@@ -228,6 +228,113 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
 @media (max-width:560px){#v-simulador:has(#rOut .big) .leyenda{display:none}#v-simulador:has(#rOut .big) .vhead h2{font-size:22px}#rOut .big{font-size:28px;margin-top:4px}#rOut .kpis{gap:8px;margin:8px 0}#rOut .kpis b{font-size:16px}#rOut .kpis div{font-size:12px;line-height:1.3}.rapido{padding:12px}.rapido .f{gap:6px}.rapido input{padding:8px}}
 @media (max-height:600px){.view .leyenda{display:none}.vhead h2{font-size:26px;margin:0}.eyebrow{display:none}.view{gap:8px;padding-top:10px}}
 @media (prefers-reduced-motion:reduce){.view,.view.on,.track{transition:none;scroll-behavior:auto}}
+/* ===== v3: legibilidad móvil, Navidad en rojo y navegación tipo app ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+:root{--xmas:#C81E1E;--xmas2:#8E0F1E}
+.home,.sim,.planes,.cat{flex:1 0 auto;min-height:auto}
+.top-wa{display:none}
+.tabbar{display:none}
+.menu a.m-xmas{color:#FFD5D5}.menu a.m-xmas.on{background:var(--xmas);color:#FFFFFF}
+/* Tarjetas de inicio */
+.tiles{grid-template-columns:repeat(3,1fr)}
+.tile.xmas{flex-direction:row;align-items:center;gap:14px}.tile.xmas .ico{margin:0;flex:0 0 48px;width:48px;height:48px}.tile.xmas .tx{flex:1}.tile.xmas .go{display:block;font-size:30px;color:#FFFFFF}
+.tile{position:relative;flex-direction:column}
+.tile .tx{display:flex;flex-direction:column;gap:3px}
+.tile .go{display:none;font-style:normal}
+.tile.xmas{grid-column:1 / -1;background:linear-gradient(120deg,var(--xmas),var(--xmas2));border-color:var(--xmas);color:#FFFFFF}
+.tile.xmas em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--sun)}
+.tile.xmas small{color:#FFE1E1}
+.tile.xmas:hover{border-color:var(--sun)}
+/* Página Navidad en rojo */
+.xmas-view{background:none}
+.xmas-view .vhead{background:linear-gradient(120deg,var(--xmas),var(--xmas2));color:#FFFFFF;border-radius:14px;padding:clamp(12px,2vh,20px) clamp(14px,2vw,24px)}
+.xmas-view .eyebrow{color:var(--sun)}
+.xmas-view .vhead h2{color:#FFFFFF}
+.xmas-view .leyenda{color:#FFE1E1}
+.xmas-view .chip{border-color:var(--xmas);color:var(--xmas)}
+.xmas-view .subtabs .chip[aria-pressed="true"]{background:var(--xmas);border-color:var(--xmas);color:#FFFFFF}
+.xmas-view .prod{border-color:#F1C4C4}
+.xmas-view .prod:hover{border-color:var(--xmas)}
+.xmas-view .ph.sin{background:linear-gradient(135deg,var(--xmas),var(--xmas2))}
+.xmas-view .cat-l,.xmas-view .prod .precio,.xmas-view .prod .precio.q{color:var(--xmas)}
+.xmas-view .prod .btn{background:var(--xmas);color:#FFFFFF}
+.xmas-view .catnav button{color:var(--xmas);border-color:#F1C4C4}
+
+/* ===== Celular ===== */
+@media (max-width:560px){
+  body{font-size:16px}
+  header.top{padding:8px 14px;gap:10px}
+  .menu,.menu-btn{display:none!important}
+  .top-wa{display:inline-flex;margin-left:auto;align-items:center;gap:6px;background:#25D366;color:#FFFFFF;border:0;border-radius:999px;padding:8px 14px 8px 10px;font:700 14px var(--f);cursor:pointer}
+  .top-wa svg{width:20px;height:20px}
+  .top-wa::after{content:"WhatsApp"}
+  .fab,.bar{display:none!important}
+  .app{grid-template-rows:auto 1fr auto auto}
+  .tabbar{display:grid;grid-template-columns:repeat(6,1fr);background:#FFFFFF;border-top:1px solid var(--line);padding:4px 2px calc(4px + env(safe-area-inset-bottom,0px));position:relative;z-index:10;box-shadow:0 -2px 10px #14213D14}
+  .tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;font-size:10.5px;font-weight:600;color:var(--muted);text-decoration:none;border-radius:10px}
+  .tabbar a span{display:block;width:24px;height:24px}.tabbar a svg{width:24px;height:24px}
+  .tabbar a.on{color:var(--navy)}
+  .tabbar a.on span{color:var(--red)}
+  .tabbar a.t-xmas{color:var(--xmas)}
+  .tabbar a.t-xmas.on{color:var(--xmas);background:#FDECEC}
+  .view{padding:14px 16px 16px;gap:12px}
+  .eyebrow{font-size:11px}
+  .vhead h2{font-size:23px;margin:2px 0 4px}
+  .leyenda{font-size:14px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  /* Inicio: una idea, un botón, lista clara */
+  .home{display:flex;flex-direction:column;gap:14px;align-content:start}
+  .home .eyebrow{display:none}
+  .home h1{font-size:31px;letter-spacing:-.8px;margin:0 0 6px}
+  .lead{font-size:15px;line-height:1.45;margin:0 0 12px}
+  .cta-row .btn{flex:1 1 100%;text-align:center;font-size:16px;padding:13px}
+  .cta-row .btn.alt{display:none}
+  .pasos{display:none}
+  .tiles{grid-template-columns:1fr;gap:8px}
+  .tile{flex-direction:row;align-items:center;gap:12px;padding:11px 12px;border-radius:12px}
+  .tile .ico{margin:0;flex:0 0 38px;width:38px;height:38px}
+  .tile .tx{flex:1;min-width:0;gap:1px}
+  .tile b{font-size:15.5px}
+  .tile small{display:block;font-size:12.5px}
+  .tile .go{display:block;font-size:26px;line-height:1;color:var(--muted)}
+  .tile.xmas{padding:14px 12px}
+  .tile.xmas b{font-size:17px}
+  .tile.xmas .go{color:#FFFFFF}
+  /* Catálogo */
+  .track{grid-auto-columns:82%}
+  .prod .ph{min-height:120px}
+  .xmas-view .vhead{padding:12px 14px}
+  .xmas-view .leyenda{-webkit-line-clamp:4}
+  /* Asesoría */
+  .planes{grid-auto-columns:84%}
+  .reglas{font-size:13px;gap:4px 14px}
+}
+@media (max-width:560px){
+  .catnav{display:none}
+  .cat-top{display:block}
+  .view:not(.xmas-view) .leyenda{-webkit-line-clamp:2}
+  .xmas-view .leyenda{-webkit-line-clamp:3}
+  .prod ul{display:none}
+  .prod .ph{min-height:96px}
+  .plan.top-p{order:-1}
+  .plan{padding:14px;gap:6px}.plan h3{font-size:18px}.plan ul{font-size:13.5px}.plan .p{font-size:28px}
+}
+@media (max-width:560px) and (max-height:700px){
+  .home{gap:10px}
+  .home h1{font-size:27px;margin-bottom:4px}.lead{font-size:14px;margin-bottom:10px}
+  .cta-row .btn{padding:11px}
+  .tiles{gap:6px}.tile{padding:8px 12px}.tile.xmas{padding:10px 12px}
+  .tile small{display:none}.tile.xmas small{display:block}
+  .vhead h2{font-size:21px}
+  .view{padding-top:10px;gap:10px}
+  .reglas{display:none}
+}
+@media (min-width:561px) and (max-height:700px){
+  .home h1{font-size:clamp(32px,4.6vw,52px);margin:6px 0 10px}.lead{margin-bottom:12px}
+  .tile{padding:12px}.tile small{font-size:12.5px}
+  .ruta{padding:14px}.ruta li{padding-bottom:8px}.ruta h3{margin-bottom:8px}
+  .ruta span{display:none}.ruta li.on span{display:inline}
+  .vhead h2{font-size:clamp(24px,3vw,32px)}
+}
 </style>
 </head>
 <body>
@@ -237,12 +344,13 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
   <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú"><span></span><span></span><span></span></button>
   <nav class="menu" id="menu" aria-label="Secciones">
     <a href="#inicio" data-v="inicio">Inicio</a>
-    <a href="#simulador" data-v="simulador">Simulador</a>
+    <a href="#navidad" data-v="navidad" class="m-xmas">Navidad</a>
     <a href="#generacion" data-v="generacion">Generación</a>
     <a href="#iluminacion" data-v="iluminacion">Iluminación</a>
-    <a href="#navidad" data-v="navidad">Navidad</a>
+    <a href="#simulador" data-v="simulador">Simulador</a>
     <a href="#asesoria" data-v="asesoria">Asesoría</a>
   </nav>
+  <button class="top-wa" id="waTop" type="button" aria-label="Escríbeme por WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16.02 3.2A12.62 12.62 0 0 0 5.16 22.25L3.4 28.7l6.6-1.73A12.63 12.63 0 1 0 16.02 3.2Zm0 22.95a10.28 10.28 0 0 1-5.24-1.43l-.38-.23-3.92 1.03 1.05-3.82-.25-.4a10.3 10.3 0 1 1 8.74 4.85Zm5.65-7.72c-.31-.16-1.84-.91-2.13-1.02-.29-.1-.5-.16-.71.16-.21.31-.81 1.02-.99 1.23-.18.21-.36.23-.67.08-.31-.16-1.31-.48-2.49-1.53-.92-.82-1.54-1.83-1.72-2.14-.18-.31-.02-.48.14-.64.14-.14.31-.36.47-.54.16-.18.21-.31.31-.52.1-.21.05-.39-.03-.54-.08-.16-.71-1.7-.97-2.33-.25-.6-.51-.52-.71-.53h-.6c-.21 0-.54.08-.83.39-.29.31-1.09 1.07-1.09 2.61s1.12 3.03 1.28 3.24c.16.21 2.2 3.36 5.33 4.71.74.32 1.32.51 1.77.65.74.24 1.42.2 1.96.12.6-.09 1.84-.75 2.1-1.49.26-.73.26-1.36.18-1.49-.08-.13-.29-.21-.6-.37Z"/></svg></button>
 </header>
 
 <main class="stage">
@@ -261,10 +369,10 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
       <p class="cred">Frances Reyes · Ingeniera en energía (UTEC) · 10 años en el sector eléctrico</p>
     </div>
     <div class="tiles">
-      <a class="tile" href="#generacion"><span class="ico" data-ico="sol"></span><b>Generación</b><small>Kits, paneles, inversores, baterías y accesorios</small></a>
-      <a class="tile" href="#iluminacion"><span class="ico" data-ico="luz"></span><b>Iluminación exterior</b><small>Reflectores, apliques, faroles y postes solares</small></a>
-      <a class="tile xmas" href="#navidad"><span class="ico" data-ico="estrella"></span><b>Navidad solar</b><small>Luces que no suben tu recibo</small></a>
-      <a class="tile" href="#asesoria"><span class="ico" data-ico="chat"></span><b>Asesoría</b><small>30 o 60 min por Teams + informe</small></a>
+      <a class="tile xmas" href="#navidad"><span class="ico" data-ico="estrella"></span><span class="tx"><em>Campaña navideña</em><b>Luces solares que no suben tu recibo</b><small>Guirnaldas, cortinas, figuras y packs para tu fachada</small></span><i class="go">›</i></a>
+      <a class="tile" href="#generacion"><span class="ico" data-ico="sol"></span><span class="tx"><b>Kits y paneles solares</b><small>Kits, paneles, inversores, baterías y accesorios</small></span><i class="go">›</i></a>
+      <a class="tile" href="#iluminacion"><span class="ico" data-ico="luz"></span><span class="tx"><b>Iluminación exterior</b><small>Reflectores, apliques, faroles y postes</small></span><i class="go">›</i></a>
+      <a class="tile" href="#asesoria"><span class="ico" data-ico="chat"></span><span class="tx"><b>Asesoría con ingeniera</b><small>30 o 60 min por Teams + informe</small></span><i class="go">›</i></a>
     </div>
   </div>
   <ol class="pasos" aria-label="Cómo comprar">
@@ -406,6 +514,14 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
   <span class="bar-l" id="foot"></span>
   <span class="bar-r">Precios en soles con IGV · Envíos a todo el Perú · Pago con Yape o Plin</span>
 </footer>
+<nav class="tabbar" aria-label="Secciones">
+  <a href="#inicio" data-v="inicio"><span data-ico="t-inicio"></span>Inicio</a>
+  <a href="#navidad" data-v="navidad" class="t-xmas"><span data-ico="t-navidad"></span>Navidad</a>
+  <a href="#generacion" data-v="generacion"><span data-ico="t-solar"></span>Solar</a>
+  <a href="#iluminacion" data-v="iluminacion"><span data-ico="t-luces"></span>Luces</a>
+  <a href="#simulador" data-v="simulador"><span data-ico="t-sim"></span>Ahorro</a>
+  <a href="#asesoria" data-v="asesoria"><span data-ico="t-ase"></span>Asesoría</a>
+</nav>
 </div>
 
 <button class="btn fab" id="wa" type="button" aria-label="Escríbeme por WhatsApp">
@@ -955,6 +1071,7 @@ function abrirEspecialista(){
   setTimeout(() => $("cNom").focus(), 50);
 }
 $("wa").addEventListener("click", abrirEspecialista);
+$("waTop").addEventListener("click", abrirEspecialista);
 $("cCerrar").addEventListener("click", () => $("dlgEsp").close());
 let ultimoEnvio = 0;
 $("cEnviar").addEventListener("click", () => {
@@ -993,9 +1110,19 @@ const ICONOS = {
   estrella: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4l5.6 12.3 13.4 1.4-10 9.1 2.9 13.2L24 33.2 12.1 40l2.9-13.2-10-9.1 13.4-1.4z" fill="#FFC94A" stroke="#E15C23" stroke-width="2" stroke-linejoin="round"/></svg>',
   chat: '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 10h32a3 3 0 0 1 3 3v17a3 3 0 0 1-3 3H22l-9 8v-8H8a3 3 0 0 1-3-3V13a3 3 0 0 1 3-3z" fill="#14213D"/><circle cx="16" cy="21.5" r="2.5" fill="#FFC94A"/><circle cx="24" cy="21.5" r="2.5" fill="#F59E2E"/><circle cx="32" cy="21.5" r="2.5" fill="#E15C23"/></svg>'
 };
+const T = d => `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+Object.assign(ICONOS, {
+  "t-inicio": T('<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>'),
+  "t-navidad": T('<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.3 6L12 16.4 6.6 19.4l1.3-6L3.4 9.3l6-.7z"/>'),
+  "t-solar": T('<circle cx="12" cy="7" r="3"/><path d="M12 1.5v1.2M6.6 7H5.4M18.6 7h-1.2M8.2 3.2l.8.8M15.8 3.2l-.8.8"/><path d="M4 21l2.2-8h11.6L20 21z"/><path d="M12 13v8M5.2 17h13.6"/>'),
+  "t-luces": T('<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/>'),
+  "t-sim": T('<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8 6.5h8M8 11h2M12 11h0M16 11h0M8 15h2M12 15h0M16 15v3M8 18.5h5"/>'),
+  "t-ase": T('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>')
+});
 const ICONO_COL = { "Generación": "sol", "Iluminación exterior": "luz", "Navidad": "estrella", "Servicios": "chat" };
-document.querySelectorAll("[data-ico]").forEach(el => { el.innerHTML = ICONOS[el.dataset.ico] || ""; });
 
+
+document.querySelectorAll("[data-ico]").forEach(el => { el.innerHTML = ICONOS[el.dataset.ico] || ""; });
 const TITULOS = { inicio: "Energía solar en todo el Perú", simulador: "Calcula tu ahorro", detallado: "Simulador detallado", generacion: "Generación de energía", iluminacion: "Iluminación exterior solar", navidad: "Navidad solar", asesoria: "Asesoría solar" };
 function irA(){
   let v = decodeURIComponent((location.hash || "#inicio").slice(1));
@@ -1004,7 +1131,7 @@ function irA(){
   v = vista.dataset.v;
   document.querySelectorAll(".view").forEach(x => { const on = x === vista; x.classList.toggle("on", on); x.toggleAttribute("inert", !on); });
   const nav = vista.dataset.nav || v;
-  document.querySelectorAll(".menu a").forEach(a => a.classList.toggle("on", a.dataset.v === nav));
+  document.querySelectorAll(".menu a, .tabbar a").forEach(a => a.classList.toggle("on", a.dataset.v === nav));
   document.title = CONFIG.negocio + " | " + (TITULOS[v] || "");
   vista.scrollTop = 0;
   cerrarMenu();
