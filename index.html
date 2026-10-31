@@ -227,6 +227,82 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
 @media (max-height:700px){#v-simulador:has(#rOut .big) .leyenda{display:none}#v-simulador .vhead h2{font-size:28px}}
 @media (max-width:560px){#v-simulador:has(#rOut .big) .leyenda{display:none}#v-simulador:has(#rOut .big) .vhead h2{font-size:22px}#rOut .big{font-size:28px;margin-top:4px}#rOut .kpis{gap:8px;margin:8px 0}#rOut .kpis b{font-size:16px}#rOut .kpis div{font-size:12px;line-height:1.3}.rapido{padding:12px}.rapido .f{gap:6px}.rapido input{padding:8px}}
 @media (max-height:600px){.view .leyenda{display:none}.vhead h2{font-size:26px;margin:0}.eyebrow{display:none}.view{gap:8px;padding-top:10px}}
+
+/* ===== Calculadoras: opciones ===== */
+.calc-col{display:flex;flex-direction:column;gap:10px;min-width:0}
+.calc-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.calc-tabs button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:#FFFFFF;color:var(--ink);font:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.calc-tabs button b{font-size:16px;line-height:1.25}
+.calc-tabs button small{font-size:13px;color:var(--muted)}
+.calc-tabs button:hover{border-color:var(--orange)}
+.calc-tabs button[aria-selected="true"]{border-color:var(--red);background:var(--cream)}
+.calc-tabs button[aria-selected="true"] b{color:var(--rust)}
+.sim .card{margin:0}
+.rapido .f.eq-f{grid-template-columns:1.6fr .8fr .7fr auto}
+.rapido .f.eq-f:has(.eq-otro:not([hidden])){grid-template-columns:1.2fr 1fr .8fr .7fr .7fr auto}
+.eq-list{margin-top:10px;max-height:190px;overflow-y:auto}
+.eq-list table{font-size:14px}
+.eq-list td,.eq-list th{padding:6px 6px}
+.eq-list th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.eq-list .q{border:0;background:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.eq-list .q:hover{color:var(--rust)}
+.eq-list .vacio{padding:16px;border:1px dashed var(--line);border-radius:10px;color:var(--muted);text-align:center;font-size:15px}
+.eq-tot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 6px}
+.eq-tot div{background:var(--cream);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--muted)}
+.eq-tot b{display:block;font-size:clamp(22px,2.6vw,30px);color:var(--rust);line-height:1.1}
+.eq-top{font-size:14px;margin:4px 0 8px}
+.eq-cta{display:flex;gap:8px;flex-wrap:wrap}.eq-cta .btn{flex:1 1 200px;text-align:center;font-size:15px}
+.eq-tar{margin:8px 0 0}
+.inl{display:inline;font-weight:400;font-size:inherit}.inl input{display:inline-block;width:64px;padding:3px 6px;margin:0;font-size:13px}
+@media (max-width:560px){
+  #v-simulador .leyenda{display:none}
+  .calc-tabs{gap:6px}
+  .calc-tabs button{padding:8px 10px;border-radius:10px}
+  .calc-tabs button b{font-size:13.5px}
+  .calc-tabs button small{font-size:11.5px}
+  .eq-f,.eq-f:has(.eq-otro:not([hidden])){grid-template-columns:1fr 1fr}
+  .eq-f .eq-sel{grid-column:1 / -1}
+  .eq-f #eAdd{grid-column:1 / -1}
+  .eq-list{max-height:150px}
+  .eq-tot b{font-size:21px}
+}
+
+/* Calculadoras: que todo quepa en una pantalla */
+#v-simulador .sim{flex:1 1 0;min-height:0;align-items:stretch}
+#v-simulador .calc-col{min-height:0}
+#v-simulador .ruta{align-self:start}
+.rapido.equipos{display:flex;flex:1 1 0;flex-direction:column;min-height:0;overflow:auto}
+.eq-otro[hidden]{display:none!important}
+#v-simulador:has(#eTot .eq-tot):has(#equipos:not([hidden])) .vhead{display:none}
+.eq-list{min-height:52px}
+@media (max-height:700px){.eq-top{display:none}.eq-tot{margin:6px 0 4px}.eq-tot div{padding:6px 10px}.eq-tot b{font-size:20px}.eq-tar{margin-top:4px}.equipos .f label{font-size:12.5px}.equipos input,.equipos select{padding:6px 8px}}
+.rapido.equipos[hidden]{display:none}
+.eq-list{flex:1 1 auto;min-height:64px;max-height:none}
+#eTot{flex:0 0 auto}
+@media (max-height:760px){#v-simulador:has(#rOut .big) .vhead,#v-simulador:has(#eTot .eq-tot) .vhead{display:none}}
+@media (max-width:560px){
+  #v-simulador:has(#rOut .big) .vhead,#v-simulador:has(#eTot .eq-tot) .vhead{display:none}
+  .rapido .f.eq-f,.rapido .f.eq-f:has(.eq-otro:not([hidden])){grid-template-columns:1fr 1fr auto;gap:6px}
+  .eq-f .eq-sel,.eq-f .eq-otro{grid-column:auto}
+  .eq-f .eq-sel{grid-column:1 / -1}
+  .eq-f #eAdd{grid-column:auto;padding:9px 12px}
+  .eq-f label{font-size:12.5px}
+  .eq-f input,.eq-f select{padding:7px 8px;margin-top:2px}
+  .eq-top{display:none}
+  .eq-cta .btn{flex:1 1 0;font-size:13px;padding:9px 8px}
+  .eq-tot{margin:8px 0 6px;gap:6px}.eq-tot div{padding:8px 10px;font-size:12px}
+  .eq-tar{font-size:11.5px;margin-top:6px}
+  .eq-list{min-height:56px}.eq-list td{font-size:13px}
+  #rOut .nota{display:none}
+}
+@media (max-width:560px){
+  #v-simulador:has(#rOut .big) .rapido .f{grid-template-columns:1fr 1fr}
+  #v-simulador:has(#rOut .big) .rapido .f #rCalc{grid-column:1 / -1}
+  #v-simulador:has(#rOut .big) .rapido .f label{font-size:12.5px}
+  #rOut .kpis div:nth-child(4){display:none}
+  #rOut .kpis{grid-template-columns:repeat(3,1fr)}
+  #rOut .res{font-size:13px;margin:2px 0}
+}
 @media (prefers-reduced-motion:reduce){.view,.view.on,.track{transition:none;scroll-behavior:auto}}
 /* ===== v3: legibilidad móvil, Navidad en rojo y navegación tipo app ===== */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -386,12 +462,17 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 <!-- ========== 2. SIMULADOR ========== -->
 <section class="view" id="v-simulador" data-v="simulador" aria-labelledby="t-sim">
   <div class="vhead">
-    <span class="eyebrow">Paso 1 · Gratis</span>
-    <h2 id="t-sim">¿Cuánto ahorrarías con paneles solares?</h2>
-    <p class="leyenda">Escribe cuánto pagas de luz y tu distrito. En segundos ves cuántos paneles necesitas, tu ahorro y en cuánto recuperas la inversión.</p>
+    <span class="eyebrow">Calculadoras gratis</span>
+    <h2 id="t-sim">¿Qué quieres calcular?</h2>
+    <p class="leyenda">Elige una opción. Es gratis, sencillo y tarda segundos.</p>
   </div>
   <div class="sim">
-    <div class="card rapido" id="rapido">
+   <div class="calc-col">
+    <div class="calc-tabs" role="tablist" aria-label="Tipo de cálculo">
+      <button type="button" role="tab" id="tabPaneles" aria-controls="rapido" aria-selected="true" data-calc="paneles"><b>¿Cuántos paneles necesito?</b><small>Con tu recibo y tu distrito</small></button>
+      <button type="button" role="tab" id="tabEquipos" aria-controls="equipos" aria-selected="false" data-calc="equipos"><b>¿Cuánto gastan mis equipos?</b><small>Costo al mes y al año</small></button>
+    </div>
+    <div class="card rapido" id="rapido" role="tabpanel" aria-labelledby="tabPaneles">
       <div class="f">
         <label>¿Cuánto pagas de luz al mes? (S/)<input id="rRecibo" type="number" min="10" max="50000" step="1" inputmode="decimal" placeholder="Ej. 180"></label>
         <label>Tu distrito o ciudad<input id="rLugar" list="lugares" autocomplete="off" placeholder="Ej. Los Olivos"></label>
@@ -401,6 +482,21 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
       <div id="rOut"><div class="vacio">Tu resultado aparecerá aquí.</div></div>
       <a class="lnk" href="#detallado">¿Tienes cortes de luz o vives sin red? Usa el modo detallado, equipo por equipo →</a>
     </div>
+    <div class="card rapido equipos" id="equipos" role="tabpanel" aria-labelledby="tabEquipos" hidden>
+      <div class="f eq-f">
+        <label class="eq-sel">Equipo<select id="eSel"></select></label>
+        <label class="eq-otro" hidden>Nombre<input id="eNom" maxlength="30" placeholder="Ej. Congeladora"></label>
+        <label class="eq-otro" hidden>Potencia (W)<input id="eW" type="number" min="1" max="20000" inputmode="numeric" placeholder="Ej. 200"></label>
+        <label>Horas al día<input id="eHoras" type="number" min="0.1" max="24" step="0.1" inputmode="decimal"></label>
+        <label>Cantidad<input id="eCant" type="number" min="1" max="99" value="1" inputmode="numeric"></label>
+        <button class="btn" id="eAdd" type="button">Agregar</button>
+      </div>
+      <div id="eMsg" class="res" role="status"></div>
+      <div id="eList" class="eq-list"><div class="vacio">Agrega tus equipos uno por uno y verás cuánto te cuesta cada uno.</div></div>
+      <div id="eTot"></div>
+      <p class="nota eq-tar">Calculado con <label class="inl">S/ <input id="eTar" type="number" step="0.01" min="0.1" max="3" inputmode="decimal"></label> por kWh (cámbialo por el de tu recibo) y 30 días al mes.</p>
+    </div>
+   </div>
     <aside class="ruta" aria-label="Cómo seguimos">
       <h3>Así seguimos después</h3>
       <ol>
@@ -1063,6 +1159,72 @@ $("rCalc").onclick = async () => {
   $("rCalc").disabled = false;
 };
 ["rRecibo","rLugar"].forEach(id => $(id).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); $("rCalc").click(); } }));
+
+/* ================= CALCULADORA: COSTO DE MIS EQUIPOS ================= */
+const EQUIPOS = [
+  ["Refrigeradora", 150, 8], ["Terma eléctrica", 1500, 1], ["Ducha eléctrica", 3500, 0.5], ["Plancha", 1000, 0.5],
+  ["Lavadora", 500, 1], ["Microondas", 1200, 0.3], ["Hervidor eléctrico", 1800, 0.2], ["Olla arrocera", 700, 0.5],
+  ["Licuadora", 400, 0.1], ["Televisor", 100, 5], ["Laptop", 60, 6], ["Computadora de escritorio", 250, 5],
+  ["Router WiFi", 12, 24], ["Focos LED", 10, 5], ["Ventilador", 60, 6], ["Aire acondicionado 12,000 BTU", 1100, 3],
+  ["Aire acondicionado 18,000 BTU", 1600, 3], ["Bomba de agua", 750, 1], ["Secadora de cabello", 1500, 0.2], ["Otro equipo", 0, 1]
+];
+let misEquipos = [];
+$("eTar").value = CONFIG.tarifa;
+$("eSel").innerHTML = EQUIPOS.map((e, i) => `<option value="${i}">${esc(e[0])}${e[1] ? ` (${fmt(e[1], 0)} W)` : ""}</option>`).join("");
+const eqSel = () => EQUIPOS.at(+$("eSel").value) || EQUIPOS[0];
+const esOtro = () => !eqSel()[1];
+function prepararEquipo(){
+  const e = eqSel();
+  $("eHoras").value = e[2];
+  document.querySelectorAll(".eq-otro").forEach(x => { x.hidden = !esOtro(); });
+  if (esOtro()) $("eNom").focus();
+}
+$("eSel").onchange = prepararEquipo;
+prepararEquipo();
+const tarifaEq = () => { const t = +$("eTar").value; return t > 0 && t < 5 ? t : CONFIG.tarifa; };
+function pintarEquipos2(){
+  const t = tarifaEq();
+  if (!misEquipos.length){
+    $("eList").innerHTML = `<div class="vacio">Agrega tus equipos uno por uno y verás cuánto te cuesta cada uno.</div>`;
+    $("eTot").innerHTML = ""; return;
+  }
+  const filas = misEquipos.map(x => ({ ...x, kwh: x.w * x.q * x.h * 30 / 1000 })).map(x => ({ ...x, mes: x.kwh * t }));
+  const totMes = filas.reduce((a, x) => a + x.mes, 0), totKwh = filas.reduce((a, x) => a + x.kwh, 0);
+  const mayor = filas.reduce((a, x) => x.mes > a.mes ? x : a, filas[0]);
+  $("eList").innerHTML = `<table><tr><th>Equipo</th><th>Al mes</th><th>Al año</th><th></th></tr>` +
+    filas.map((x, i) => `<tr><td>${esc(x.n)}${x.q > 1 ? ` ×${x.q}` : ""}<br><span class="nota">${fmt(x.w, 0)} W · ${fmt(x.h, 1)} h/día</span></td><td>${sol$(x.mes)}</td><td>${sol$(x.mes * 12)}</td><td><button class="q" type="button" data-qui="${i}" aria-label="Quitar ${esc(x.n)}">×</button></td></tr>`).join("") + `</table>`;
+  $("eTot").innerHTML = `<div class="eq-tot"><div><b>${sol$(totMes)}</b>al mes (${fmt(totKwh, 0)} kWh)</div><div><b>${sol$(totMes * 12)}</b>al año</div></div>
+    ${filas.length > 1 ? `<p class="eq-top">El que más gasta: <b>${esc(mayor.n)}</b>, el ${fmt(mayor.mes / totMes * 100, 0)} % de este total.</p>` : ""}
+    <div class="eq-cta"><button class="btn" type="button" id="eWA">Quiero bajar este gasto</button><button class="btn alt" type="button" id="ePan">¿Cuántos paneles cubren esto?</button></div>`;
+  $("eWA").onclick = () => {
+    let txt = `Hola, Frances. Calculé el gasto de mis equipos en tu web: ${sol$(totMes)} al mes (${fmt(totKwh, 0)} kWh) y ${sol$(totMes * 12)} al año.`;
+    txt += "\n" + filas.map(x => `- ${x.n}${x.q > 1 ? " x" + x.q : ""}: ${sol$(x.mes)} al mes`).join("\n");
+    txt += "\n¿Cómo puedo bajar este gasto?";
+    abrirWhatsApp(txt);
+  };
+  $("ePan").onclick = () => { $("rRecibo").value = Math.max(10, Math.round(totMes)); elegirCalc("paneles"); $("rLugar").focus(); };
+}
+$("eList").addEventListener("click", e => { const b = e.target.closest("[data-qui]"); if (!b) return; misEquipos.splice(+b.dataset.qui, 1); pintarEquipos2(); });
+$("eTar").addEventListener("input", pintarEquipos2);
+$("eAdd").onclick = () => {
+  const e = eqSel(), m = $("eMsg"); m.className = "res"; m.textContent = "";
+  const n = esOtro() ? $("eNom").value.replace(/[<>]/g, "").trim().slice(0, 30) : e[0];
+  const w = esOtro() ? +$("eW").value : e[1], h = +$("eHoras").value, q = Math.round(+$("eCant").value || 1);
+  if (!n) { m.className = "res err"; m.textContent = "Escribe el nombre del equipo."; $("eNom").focus(); return; }
+  if (!(w > 0 && w <= 20000)) { m.className = "res err"; m.textContent = "Escribe la potencia en watts (está en la etiqueta del equipo)."; $("eW").focus(); return; }
+  if (!(h > 0 && h <= 24)) { m.className = "res err"; m.textContent = "Escribe cuántas horas al día lo usas (entre 0.1 y 24)."; $("eHoras").focus(); return; }
+  if (!(q >= 1 && q <= 99)) { m.className = "res err"; m.textContent = "La cantidad debe estar entre 1 y 99."; return; }
+  if (misEquipos.length >= 30) { m.className = "res err"; m.textContent = "Máximo 30 equipos."; return; }
+  misEquipos.push({ n, w, h, q });
+  $("eCant").value = 1; if (esOtro()) { $("eNom").value = ""; $("eW").value = ""; $("eSel").value = "0"; prepararEquipo(); }
+  pintarEquipos2();
+  $("eList").scrollTop = $("eList").scrollHeight;
+};
+function elegirCalc(c){
+  document.querySelectorAll(".calc-tabs [data-calc]").forEach(b => b.setAttribute("aria-selected", b.dataset.calc === c));
+  $("rapido").hidden = c !== "paneles"; $("equipos").hidden = c !== "equipos";
+}
+document.querySelector(".calc-tabs").addEventListener("click", e => { const b = e.target.closest("[data-calc]"); if (b) elegirCalc(b.dataset.calc); });
 
 /* ================= CONTACTO POR WHATSAPP ================= */
 function abrirEspecialista(){
