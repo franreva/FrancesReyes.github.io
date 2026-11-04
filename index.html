@@ -897,7 +897,8 @@ const CONFIG = {
   rendimientoRespaldo: 1500, // kWh por kWp al año si no hay datos solares en línea
   // Catálogo: enlace CSV de "Archivo > Compartir > Publicar en la Web" (solo la pestaña Productos)
   catalogoCSV: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSccyYZp7NbU4vklbRZ12CdKmZkVChkiFshjhH2_5fjm3FgVb_OBPNbMJqrzFjpezNyMUM3-Emh8jze/pub?gid=2035835181&single=true&output=csv",
-  carpetaFotos: "imagenes/", // si la columna foto tiene solo un nombre (panel-450.jpg), se busca aquí
+  // Fotos y fichas PDF: viven en la app AppSheet (no en GitHub)
+  appsheet: { app: "SocioSolarAdmin-6305359", tabla: "Productos" },
   // Campaña navideña: fechas de corte de envíos
   navidad: { corteProvincia: "15 de diciembre", corteLima: "21 de diciembre" },
   // Asesorías: el precio y lo que incluye se leen de la hoja (códigos ase-express y ase-plus); esto es el respaldo
@@ -1399,17 +1400,17 @@ const esSi = v => /^(si|sí|s|x|1|true|verdadero)$/i.test(String(v).trim());
 const urlSegura = u => /^https:\/\//i.test(u) ? u : "";
 const numero = v => Number(String(v ?? "").replace(/[^\d.]/g, "")) || 0;
 const soles = n => "S/ " + Number(n).toLocaleString("es-PE", { maximumFractionDigits: 2 });
-const urlApp = u => /^https:\/\/(www\.)?appsheet\.com\/template\/gettablefileurl\?/i.test(String(u || "").trim()) ? String(u).trim() : "";
-function fotoDe(p){
-  if (urlApp(p.foto_url)) return urlApp(p.foto_url);
-  const f = p.foto || "";
+/* Fotos y fichas: se suben desde la app AppSheet (columnas foto_app y ficha_app) */
+function archivoApp(v, pdf){
+  const f = String(v || "").trim();
   if (!f) return "";
-  // Enlace de Google Drive (compartido como "Cualquier persona con el enlace"): se convierte en imagen directa
   const drive = f.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{20,})/);
-  if (drive) return "https://lh3.googleusercontent.com/d/" + drive[1];
+  if (drive) return pdf ? "https://drive.google.com/uc?export=download&id=" + drive[1] : "https://lh3.googleusercontent.com/d/" + drive[1];
   if (/^https:\/\//i.test(f)) return f;
-  return /^[\w.-]+$/.test(f) ? CONFIG.carpetaFotos + f : "";
+  if (/^[\w .()\/-]+\.\w{2,5}$/.test(f) && !f.includes("..")) return `https://www.appsheet.com/template/gettablefileurl?appName=${encodeURIComponent(CONFIG.appsheet.app)}&tableName=${encodeURIComponent(CONFIG.appsheet.tabla)}&fileName=${encodeURIComponent(f)}`;
+  return "";
 }
+const fotoDe = p => archivoApp(p.foto_app);
 /* Ofertas: descuento_pct (ej. 20), campana (ej. Cyber Day) y oferta_hasta (fecha opcional) */
 function pctDe(v){
   const t = String(v ?? "").trim().replace(",", ".");
@@ -1436,21 +1437,7 @@ function ofertaDe(p){
   }
   return { pct, camp: (p.campana || "").trim(), quedan };
 }
-/* Ficha técnica: nombre de archivo en imagenes/, enlace https o enlace de Google Drive */
-function respaldoFoto(p, actual){
-  const f = (p.foto || "").trim();
-  const alt = /^[\w.-]+\.(jpe?g|png|webp|gif)$/i.test(f) ? CONFIG.carpetaFotos + f : "";
-  return alt && alt !== actual ? ` data-alt="${esc(alt)}"` : "";
-}
-function fichaDe(p){
-  if (urlApp(p.ficha_url)) return urlApp(p.ficha_url);
-  const f = (p.ficha_pdf || "").trim();
-  if (!f) return "";
-  const drive = f.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{20,})/);
-  if (drive) return "https://drive.google.com/uc?export=download&id=" + drive[1];
-  if (/^https:\/\//i.test(f)) return f;
-  return /^[\w.-]+\.pdf$/i.test(f) ? CONFIG.carpetaFotos + f : "";
-}
+const fichaDe = p => archivoApp(p.ficha_app, true);
 const ICONO_PDF = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 11v6M9.5 14.5L12 17l2.5-2.5"/></svg>';
 function precioDe(p){
   const n = numero(p.precio), tipo = (p.tipo_precio || "fijo").toLowerCase(), of = ofertaDe(p);
@@ -1469,7 +1456,7 @@ function tarjeta(p){
   const feats = (p.caracteristicas || "").split(";").map(x => x.trim()).filter(Boolean).slice(0, 3);
   const badge = pr.of ? `<span class="dto">−${fmt(pr.of.pct, 1)}%</span><span class="camp-tag">${esc(pr.of.camp || "Oferta")}${pr.of.quedan ? `<small>${esc(pr.of.quedan)}</small>` : ""}</span>` : "";
   const ph = foto
-    ? `<div class="ph">${badge}<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer"${respaldoFoto(p, foto)} onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.removeAttribute('data-alt')}else{this.parentNode.classList.add('sin');this.remove()}"><span class="ico-alt">${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</span></div>`
+    ? `<div class="ph">${badge}<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('sin');this.remove()"><span class="ico-alt">${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</span></div>`
     : `<div class="ph sin">${badge}${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</div>`;
   return `<article class="prod${pr.of ? " con-oferta" : ""}${agotado ? " agotado" : ""}" data-codigo="${esc(p.codigo)}">${ph}
     <div class="bd">
