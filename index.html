@@ -903,7 +903,7 @@ const CONFIG = {
   // Asesorías: el precio y lo que incluye se leen de la hoja (códigos ase-express y ase-plus); esto es el respaldo
   asesorias: [
     { codigo: "gratis", nombre: "Cálculo rápido", precio: 0, incluye: ["Tu recibo y tu distrito", "Número de paneles y ahorro aproximado", "Inversión y años de retorno", "Al instante en esta web"] },
-    { codigo: "ase-express", nombre: "Asesoría Express", precio: 59, destacado: true, promo: { precio: 39, texto: "Precio de lanzamiento para los primeros 20 clientes" }, incluye: ["30 min por Teams", "Informe PDF Socio Solar", "Paneles, inversor y batería", "Producción mensual y ahorro estimado"] },
+    { codigo: "ase-express", nombre: "Asesoría Express", precio: 59, destacado: true, incluye: ["30 min por Teams", "Informe PDF Socio Solar", "Paneles, inversor y batería", "Producción mensual y ahorro estimado"] },
     { codigo: "ase-plus", nombre: "Asesoría Plus", precio: 129, desde: true, incluye: ["60 min por Teams", "2 o 3 alternativas comparadas", "Lista de equipos con precios", "Retorno de inversión"] }
   ]
 };
@@ -1461,7 +1461,7 @@ function precioDe(p){
   return { of, orig: n, fin, html: pre + soles(fin),
     txt: `${preT}${soles(fin)} con ${of.pct} % de descuento${of.camp ? " de " + of.camp : ""}, antes ${soles(n)}` };
 }
-var catProductos = [];
+var catProductos = [], catTodos = [];
 function tarjeta(p){
   const pr = precioDe(p), foto = fotoDe(p), yt = urlSegura(p.youtube), ficha = fichaDe(p);
   const stockN = p.stock === "" || p.stock == null ? null : numero(p.stock);
@@ -1534,15 +1534,17 @@ document.addEventListener("click", e => {
 
 /* ================= ASESORÍAS (precios desde la hoja, con respaldo) ================= */
 function pintarPlanes(){
-  const deHoja = c => catProductos.find(p => p.codigo === c);
+  const deHoja = c => catTodos.find(p => p.codigo === c);
   const planes = CONFIG.asesorias.map(a => {
     const h = deHoja(a.codigo);
     if (!h) return a;
+    if (!esSi(h.mostrar_web)) return null;
     const precio = numero(h.precio) || a.precio, of = ofertaDe(h);
-    const promo = of && precio ? { precio: Math.round(precio * (1 - of.pct / 100) * 100) / 100, texto: `${of.camp || "Oferta"}: ${fmt(of.pct, 1)} % de descuento${of.quedan ? " · " + of.quedan.toLowerCase() : ""}` } : a.promo;
+    const promo = of && precio ? { precio: Math.round(precio * (1 - of.pct / 100) * 100) / 100, texto: `${of.camp || "Oferta"}: ${fmt(of.pct, 1)} % de descuento${of.quedan ? " · " + of.quedan.toLowerCase() : ""}` } : null;
     return { ...a, promo, nombre: h.nombre || a.nombre, precio, desde: (h.tipo_precio || "").toLowerCase() === "desde", incluye: (h.caracteristicas || "").split(";").map(x => x.trim()).filter(Boolean).length ? h.caracteristicas.split(";").map(x => x.trim()).filter(Boolean) : a.incluye };
   });
-  $("planes").innerHTML = planes.map(a => {
+  const visibles = planes.filter(Boolean);
+  $("planes").innerHTML = visibles.map(a => {
     const promo = a.promo && a.promo.precio && a.precio ? a.promo : null;
     const precio = !a.precio ? "Gratis" : promo ? `<s>${soles(a.precio)}</s>${soles(promo.precio)}` : (a.desde ? "<small>Desde</small> " : "") + soles(a.precio);
     return `<article class="plan${a.destacado ? " top-p" : ""}">
@@ -1556,7 +1558,7 @@ function pintarPlanes(){
   }).join("");
   $("planes").onclick = e => {
     const b = e.target.closest("[data-plan]"); if (!b) return;
-    const a = planes.find(x => x.codigo === b.dataset.plan); if (!a) return;
+    const a = visibles.find(x => x.codigo === b.dataset.plan); if (!a) return;
     const precio = a.promo && a.promo.precio ? a.promo.precio : a.precio;
     let t = `Hola, Frances. Quiero reservar la ${a.nombre} (${a.desde ? "desde " : ""}${soles(precio)}). ¿Qué horarios tienes?`;
     if (rapido) t += `\nMi cálculo rápido: ${rapido.N} paneles para ${rapido.lugar}, recibo de ${sol$(rapido.recibo)} al mes.`;
@@ -1569,7 +1571,8 @@ async function cargarCatalogo(){
     if (!/^https:\/\/docs\.google\.com\//.test(CONFIG.catalogoCSV)) throw new Error("sin enlace");
     const r = await fetch(CONFIG.catalogoCSV, { cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer" });
     if (!r.ok) throw new Error(r.status);
-    catProductos = leerCSV(await r.text())
+    catTodos = leerCSV(await r.text());
+    catProductos = catTodos
       .filter(p => p.nombre && esSi(p.mostrar_web))
       .sort((a, b) => (Number(a.orden) || 999) - (Number(b.orden) || 999));
     cajas.forEach(montarSeccion);
