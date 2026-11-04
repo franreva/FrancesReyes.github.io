@@ -349,6 +349,7 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
 .prod .acc .pdf{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 .prod .acc .pdf svg{width:17px;height:17px;flex:0 0 auto}
 .prod.resaltado{border-color:var(--red);box-shadow:0 0 0 3px #E15C2366,0 10px 24px #14213D26}
+.ph .ico-alt{display:none}.ph.sin .ico-alt{display:contents}
 @media (prefers-reduced-motion:reduce){.view,.view.on,.track{transition:none;scroll-behavior:auto}}
 /* ===== v3: legibilidad móvil, Navidad en rojo y navegación tipo app ===== */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -1463,7 +1464,7 @@ function tarjeta(p){
   const feats = (p.caracteristicas || "").split(";").map(x => x.trim()).filter(Boolean).slice(0, 3);
   const badge = pr.of ? `<span class="dto">−${fmt(pr.of.pct, 1)}%</span><span class="camp-tag">${esc(pr.of.camp || "Oferta")}${pr.of.quedan ? `<small>${esc(pr.of.quedan)}</small>` : ""}</span>` : "";
   const ph = foto
-    ? `<div class="ph">${badge}<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer"></div>`
+    ? `<div class="ph">${badge}<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('sin');this.remove()"><span class="ico-alt">${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</span></div>`
     : `<div class="ph sin">${badge}${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</div>`;
   return `<article class="prod${pr.of ? " con-oferta" : ""}${agotado ? " agotado" : ""}" data-codigo="${esc(p.codigo)}">${ph}
     <div class="bd">
