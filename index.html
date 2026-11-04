@@ -1437,6 +1437,11 @@ function ofertaDe(p){
   return { pct, camp: (p.campana || "").trim(), quedan };
 }
 /* Ficha técnica: nombre de archivo en imagenes/, enlace https o enlace de Google Drive */
+function respaldoFoto(p, actual){
+  const f = (p.foto || "").trim();
+  const alt = /^[\w.-]+\.(jpe?g|png|webp|gif)$/i.test(f) ? CONFIG.carpetaFotos + f : "";
+  return alt && alt !== actual ? ` data-alt="${esc(alt)}"` : "";
+}
 function fichaDe(p){
   if (urlApp(p.ficha_url)) return urlApp(p.ficha_url);
   const f = (p.ficha_pdf || "").trim();
@@ -1464,7 +1469,7 @@ function tarjeta(p){
   const feats = (p.caracteristicas || "").split(";").map(x => x.trim()).filter(Boolean).slice(0, 3);
   const badge = pr.of ? `<span class="dto">−${fmt(pr.of.pct, 1)}%</span><span class="camp-tag">${esc(pr.of.camp || "Oferta")}${pr.of.quedan ? `<small>${esc(pr.of.quedan)}</small>` : ""}</span>` : "";
   const ph = foto
-    ? `<div class="ph">${badge}<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('sin');this.remove()"><span class="ico-alt">${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</span></div>`
+    ? `<div class="ph">${badge}<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer"${respaldoFoto(p, foto)} onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.removeAttribute('data-alt')}else{this.parentNode.classList.add('sin');this.remove()}"><span class="ico-alt">${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</span></div>`
     : `<div class="ph sin">${badge}${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</div>`;
   return `<article class="prod${pr.of ? " con-oferta" : ""}${agotado ? " agotado" : ""}" data-codigo="${esc(p.codigo)}">${ph}
     <div class="bd">
