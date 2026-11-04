@@ -348,6 +348,7 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
 .prod .acc .btn.alt{flex:0 0 auto;font-size:13px;padding:9px 10px}
 .prod .acc .pdf{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
 .prod .acc .pdf svg{width:17px;height:17px;flex:0 0 auto}
+.prod.resaltado{border-color:var(--red);box-shadow:0 0 0 3px #E15C2366,0 10px 24px #14213D26}
 @media (prefers-reduced-motion:reduce){.view,.view.on,.track{transition:none;scroll-behavior:auto}}
 /* ===== v3: legibilidad móvil, Navidad en rojo y navegación tipo app ===== */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -1332,8 +1333,35 @@ const ICONO_COL = { "Generación": "sol", "Iluminación exterior": "luz", "Navid
 
 document.querySelectorAll("[data-ico]").forEach(el => { el.innerHTML = ICONOS[el.dataset.ico] || ""; });
 const TITULOS = { inicio: "Energía solar en todo el Perú", simulador: "Calcula tu ahorro", detallado: "Simulador detallado", generacion: "Generación de energía", iluminacion: "Iluminación exterior solar", navidad: "Navidad solar", asesoria: "Asesoría solar" };
+/* Enlace directo a un producto: #p-<codigo> (lo usa la app de administración y WhatsApp) */
+const VISTA_COL = { "Generación": "generacion", "Iluminación exterior": "iluminacion", "Navidad": "navidad", "Servicios": "asesoria" };
+let productoPendiente = "";
+function mostrarProducto(codigo){
+  const p = catProductos.find(x => x.codigo === codigo);
+  if (!p) { productoPendiente = ""; return false; }
+  const vista = VISTA_COL[p.coleccion] || "generacion";
+  const caja = document.querySelector(`.view[data-v="${vista}"] .cat`);
+  if (caja){ const todos = caja.querySelector('[data-sub="Todos"]'); if (todos && todos.getAttribute("aria-pressed") !== "true") todos.click(); }
+  history.replaceState(null, "", "#" + vista);
+  irA();
+  setTimeout(() => {
+    const card = document.querySelector(`.view[data-v="${vista}"] .prod[data-codigo="${CSS.escape(codigo)}"]`);
+    if (!card) return;
+    const track = card.parentElement;
+    track.scrollTo({ left: card.offsetLeft - track.offsetLeft, behavior: "smooth" });
+    card.classList.add("resaltado");
+    setTimeout(() => card.classList.remove("resaltado"), 2600);
+  }, 120);
+  productoPendiente = "";
+  return true;
+}
 function irA(){
   let v = decodeURIComponent((location.hash || "#inicio").slice(1));
+  if (v.startsWith("p-")) {
+    productoPendiente = v.slice(2);
+    if (catProductos && catProductos.length && mostrarProducto(productoPendiente)) return;
+    v = "generacion";
+  }
   if (v === "catalogo") v = "generacion";
   const vista = document.querySelector(`.view[data-v="${CSS.escape(v)}"]`) || document.querySelector('.view[data-v="inicio"]');
   v = vista.dataset.v;
@@ -1370,7 +1398,9 @@ const esSi = v => /^(si|sí|s|x|1|true|verdadero)$/i.test(String(v).trim());
 const urlSegura = u => /^https:\/\//i.test(u) ? u : "";
 const numero = v => Number(String(v ?? "").replace(/[^\d.]/g, "")) || 0;
 const soles = n => "S/ " + Number(n).toLocaleString("es-PE", { maximumFractionDigits: 2 });
+const urlApp = u => /^https:\/\/(www\.)?appsheet\.com\/template\/gettablefileurl\?/i.test(String(u || "").trim()) ? String(u).trim() : "";
 function fotoDe(p){
+  if (urlApp(p.foto_url)) return urlApp(p.foto_url);
   const f = p.foto || "";
   if (!f) return "";
   // Enlace de Google Drive (compartido como "Cualquier persona con el enlace"): se convierte en imagen directa
@@ -1407,6 +1437,7 @@ function ofertaDe(p){
 }
 /* Ficha técnica: nombre de archivo en imagenes/, enlace https o enlace de Google Drive */
 function fichaDe(p){
+  if (urlApp(p.ficha_url)) return urlApp(p.ficha_url);
   const f = (p.ficha_pdf || "").trim();
   if (!f) return "";
   const drive = f.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{20,})/);
@@ -1424,7 +1455,7 @@ function precioDe(p){
   return { of, orig: n, fin, html: pre + soles(fin),
     txt: `${preT}${soles(fin)} con ${of.pct} % de descuento${of.camp ? " de " + of.camp : ""}, antes ${soles(n)}` };
 }
-let catProductos = [];
+var catProductos = [];
 function tarjeta(p){
   const pr = precioDe(p), foto = fotoDe(p), yt = urlSegura(p.youtube), ficha = fichaDe(p);
   const stockN = p.stock === "" || p.stock == null ? null : numero(p.stock);
@@ -1434,7 +1465,7 @@ function tarjeta(p){
   const ph = foto
     ? `<div class="ph">${badge}<img src="${esc(foto)}" alt="${esc(p.nombre)}" loading="lazy" referrerpolicy="no-referrer"></div>`
     : `<div class="ph sin">${badge}${ICONOS[ICONO_COL[p.coleccion]] || ICONOS.sol}</div>`;
-  return `<article class="prod${pr.of ? " con-oferta" : ""}${agotado ? " agotado" : ""}">${ph}
+  return `<article class="prod${pr.of ? " con-oferta" : ""}${agotado ? " agotado" : ""}" data-codigo="${esc(p.codigo)}">${ph}
     <div class="bd">
       <div class="fila-cat"><span class="cat-l">${esc(p.categoria || p.coleccion)}</span><span class="stk ${stockN === null ? "conf" : agotado ? "ago" : stockN <= 3 ? "poco" : "ok"}">${stockN === null ? "Stock por confirmar" : agotado ? "Agotado" : stockN <= 3 ? `¡Solo quedan ${fmt(stockN, 0)}!` : "En stock"}</span></div>
       <h3>${esc(p.nombre)}</h3>
@@ -1536,6 +1567,7 @@ async function cargarCatalogo(){
       .filter(p => p.nombre && esSi(p.mostrar_web))
       .sort((a, b) => (Number(a.orden) || 999) - (Number(b.orden) || 999));
     cajas.forEach(montarSeccion);
+    if (productoPendiente) mostrarProducto(productoPendiente);
     const ofs = catProductos.map(p => ({ p, of: ofertaDe(p) })).filter(x => x.of && x.p.coleccion !== "Servicios");
     if (ofs.length){
       const top = ofs.reduce((a, x) => x.of.pct > a.of.pct ? x : a, ofs[0]);
