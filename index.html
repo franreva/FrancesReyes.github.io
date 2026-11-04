@@ -342,6 +342,12 @@ header.top{margin:0;border-radius:0;padding:10px max(16px,calc((100% - 1180px)/2
 @media (max-height:600px){.xmas-view .leyenda{display:none}.xmas-view .vhead{padding:8px 14px}}
 @media (max-height:700px) and (min-width:561px){.prod .ph{min-height:56px}.prod .bd{padding:10px 12px;gap:4px}.antes{font-size:12px}}
 @media (max-width:560px) and (max-height:660px){.home h1{font-size:25px}}
+
+/* Ficha técnica PDF */
+.prod .acc .btn[data-pedir]{flex:1 1 auto}
+.prod .acc .btn.alt{flex:0 0 auto;font-size:13px;padding:9px 10px}
+.prod .acc .pdf{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.prod .acc .pdf svg{width:17px;height:17px;flex:0 0 auto}
 @media (prefers-reduced-motion:reduce){.view,.view.on,.track{transition:none;scroll-behavior:auto}}
 /* ===== v3: legibilidad móvil, Navidad en rojo y navegación tipo app ===== */
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
@@ -1399,6 +1405,16 @@ function ofertaDe(p){
   }
   return { pct, camp: (p.campana || "").trim(), quedan };
 }
+/* Ficha técnica: nombre de archivo en imagenes/, enlace https o enlace de Google Drive */
+function fichaDe(p){
+  const f = (p.ficha_pdf || "").trim();
+  if (!f) return "";
+  const drive = f.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=\w+&)?id=)([\w-]{20,})/);
+  if (drive) return "https://drive.google.com/uc?export=download&id=" + drive[1];
+  if (/^https:\/\//i.test(f)) return f;
+  return /^[\w.-]+\.pdf$/i.test(f) ? CONFIG.carpetaFotos + f : "";
+}
+const ICONO_PDF = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 11v6M9.5 14.5L12 17l2.5-2.5"/></svg>';
 function precioDe(p){
   const n = numero(p.precio), tipo = (p.tipo_precio || "fijo").toLowerCase(), of = ofertaDe(p);
   const pre = tipo === "desde" ? "<small>Desde</small> " : "", preT = tipo === "desde" ? "desde " : "";
@@ -1410,7 +1426,7 @@ function precioDe(p){
 }
 let catProductos = [];
 function tarjeta(p){
-  const pr = precioDe(p), foto = fotoDe(p), yt = urlSegura(p.youtube);
+  const pr = precioDe(p), foto = fotoDe(p), yt = urlSegura(p.youtube), ficha = fichaDe(p);
   const stockN = p.stock === "" || p.stock == null ? null : numero(p.stock);
   const agotado = stockN !== null && stockN <= 0;
   const feats = (p.caracteristicas || "").split(";").map(x => x.trim()).filter(Boolean).slice(0, 3);
@@ -1428,6 +1444,7 @@ function tarjeta(p){
       ${pr.fin != null ? `<div class="antes">Antes <s>${soles(pr.orig)}</s> <span class="ahorro">Ahorras ${soles(pr.orig - pr.fin)}</span></div>` : ""}
       <div class="acc">
         <button class="btn" type="button" data-pedir="${catProductos.indexOf(p)}">${agotado ? "Avísame cuando llegue" : pr.q ? "Consultar" : "Pedir por WhatsApp"}</button>
+        ${ficha ? `<a class="btn alt pdf" href="${esc(ficha)}" download="${esc("Ficha tecnica - " + (p.nombre || p.codigo) + ".pdf")}" target="_blank" rel="noopener" title="Descargar ficha técnica en PDF">${ICONO_PDF}<span>Ficha</span></a>` : ""}
         ${yt ? `<a class="btn alt" href="${esc(yt)}" target="_blank" rel="noopener noreferrer">Video</a>` : ""}
       </div>
     </div></article>`;
